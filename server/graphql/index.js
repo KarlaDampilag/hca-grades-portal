@@ -45,6 +45,7 @@ type Query {
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
   addUsers(users: [UserInput!]!): [User]
+  deleteUsers: Null
   addSection(id: String!, name: String, adviserId: String!, students: [UserInput!]!): Section
   login(email: String!, password: String!): User
   logout: Null
@@ -172,6 +173,20 @@ const resolvers = {
       };
 
       return await protectEndpoint(context, ['admin', 'schoolAdmin'], callback);
+    },
+
+    deleteUsers: async (root, args, context) => {
+      const callback = async () => {
+        const users = await User.find().exec();
+        const nonAdmin = users.filter(user => {
+          return user.role.type != 'admin';
+        });
+        for (const user of nonAdmin) {
+          await User.deleteOne({ id: user.id }).exec();
+        }
+      };
+
+      return await protectEndpoint(context, ['admin'], callback);
     },
 
     addSection: async (root, { id, name, adviserId, students }, context) => {
