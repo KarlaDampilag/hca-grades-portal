@@ -37,6 +37,7 @@ input UserInput {
   role: Object
 }
 type Query {
+  me: User
   user(id: String!): User
   users(filter: UserInput): [User]
   sections: [Section]
@@ -104,6 +105,14 @@ const createUser = async (context, id, firstName, lastName, middleInitial, email
 
 const resolvers = {
   Query: {
+    me: async (root, args, context) => {
+      const requesterId = getRequesterId(context);
+      if (!requesterId) {
+        return null;
+      } else {
+        return await User.findById(requesterId);
+      }
+    },
     users: async (root, args, context) => {
       const callback = async () => {
         let filter = {};
