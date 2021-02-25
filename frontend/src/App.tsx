@@ -14,7 +14,6 @@ import Sections from './views/schoolAdmin/Sections';
 import AddSection from './views/schoolAdmin/AddSection';
 import Teachers from './views/schoolAdmin/Teachers';
 import AddTeacher from './views/schoolAdmin/AddTeacher';
-import Home from './views/universal/Home';
 import Login from './views/universal/Login';
 import Header from './components/Header';
 
@@ -55,31 +54,41 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <Header user={user} />
-      </header>
-      <div className='App-body'>
-        <Card>
-          <Switch>
-            <Route path='/login' component={() => <Login user={user} />} />
-            {user ?
-              <>
-                <Route path='/sections' component={Sections} />
-                <Route path='/addSection' component={AddSection} />
-                <Route path='/users' component={Users} />
-                <Route path='/addUser' component={AddUser} />
-                <Route path='/teachers' component={Teachers} />
-                <Route path='/addTeacher' component={AddTeacher} />
-              </> : <>
-                <p>Please log in to use this application.</p>
-              </>
-            }
-          </Switch>
-        </Card>
+    <MyContext.Provider value={{
+      user: user
+    }}>
+      <div className="App">
+        <header className="App-header">
+          <Header />
+        </header>
+        <div className='App-body'>
+          <Card>
+            <Switch>
+              <Route path='/login' component={() => <Login />} />
+              {user ?
+                <>
+                  <Route path='/sections' component={Sections} />
+                  <Route path='/addSection' component={AddSection} />
+                  <Route path='/users' component={Users} />
+                  <Route path='/addUser' component={AddUser} />
+                  <Route path='/teachers' component={Teachers} />
+                  <Route path='/addTeacher' component={AddTeacher} />
+                </> : <>
+                  <p>Please log in to use this application.</p>
+                </>
+              }
+            </Switch>
+          </Card>
+        </div>
       </div>
-    </div>
+    </MyContext.Provider>
   );
 }
 
 export default App;
+
+export const MyContext = React.createContext<{
+  user: User | undefined
+}>({
+  user: undefined
+});

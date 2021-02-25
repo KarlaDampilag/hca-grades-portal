@@ -2,6 +2,8 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 
+import { MyContext } from './../../App';
+
 const layout = {
     labelCol: { span: 3 },
     wrapperCol: { span: 21 },
@@ -10,17 +12,20 @@ const tailLayout = {
     wrapperCol: { offset: 3, span: 21 },
 };
 
-const Login = (props) => {
+const Login = () => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    
     const history = useHistory();
 
     const [email, setEmail] = React.useState<string>();
     const [password, setPassword] = React.useState<string>();
 
     React.useEffect(() => {
-        if (props.user) {
+        if (user) {
             history.push('/');
         }
-    }, [props.user, history]);
+    }, [user, history]);
 
     const handleFormSubmit = async () => {
         const query = `

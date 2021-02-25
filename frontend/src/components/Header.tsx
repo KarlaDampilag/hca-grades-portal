@@ -3,11 +3,13 @@ import * as _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { Menu } from 'antd';
 
+import { MyContext } from './../App';
 import LogoutButton from './LogoutButton';
 
-const Header = (props) => {
+const Header = () => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
     const [selectedKey, setSelectedKey] = React.useState<string>('');
-    const { user } = props;
 
     return (
         <div id='header'>
