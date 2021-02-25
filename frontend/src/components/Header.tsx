@@ -5,42 +5,9 @@ import { Menu } from 'antd';
 
 import LogoutButton from './LogoutButton';
 
-import { User } from '../interfaces';
-
-const Header = () => {
-    const [user, setUser] = React.useState<User>();
+const Header = (props) => {
     const [selectedKey, setSelectedKey] = React.useState<string>('');
-
-    React.useEffect(() => {
-        const query = `
-        query {
-            me {
-                firstName
-                lastName
-                middleInitial
-                email
-                role
-            }
-        }
-        `;
-
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setUser(res.data.me);
-            })
-            .catch(err => console.log(err));
-    }, []);
+    const { user } = props;
 
     return (
         <div id='header'>
