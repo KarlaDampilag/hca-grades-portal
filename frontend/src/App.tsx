@@ -26,6 +26,7 @@ function App() {
     const query = `
     query {
         me {
+            id
             firstName
             lastName
             middleInitial

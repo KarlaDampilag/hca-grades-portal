@@ -138,7 +138,9 @@ const resolvers = {
           const sections = await Section.find({}).exec();
           if (sections) {
             for (const section of sections) {
+              console.log('id', section.adviserId);
               const adviser = await User.findById(section.adviserId).exec();
+              console.log(adviser);
               if (adviser) {
                 section.adviserId = adviser;
               }
@@ -213,7 +215,7 @@ const resolvers = {
           throw new Error(err);
         }
       };
-      return await protectEndpoint(context, ['admin', 'schoolAdmin'], callback);
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
     },
 
     login: async (root, { email, password }, context) => {

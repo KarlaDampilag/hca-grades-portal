@@ -11,6 +11,8 @@ import { User } from '../../interfaces';
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
+import { MyContext } from './../../App';
+
 interface sectionParams {
     name: string,
     adviserId: string
@@ -32,7 +34,10 @@ interface student extends studentParams {
     id: string
 }
 
-const AddSection = (props) => {
+const AddSection = () => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+
     const [teachers, setTeachers] = React.useState<readonly User[]>();
     const [sectionName, setSectionName] = React.useState<string>('');
     const [selectedTeacherId, setSelectedTeacherId] = React.useState<string>('');
@@ -53,23 +58,32 @@ const AddSection = (props) => {
         }
         `;
 
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query
+        if (user?.role.type == 'teacher') {
+            const holder: User[] = [];
+            holder.push(user);
+            setTeachers(holder);
+        } else {
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query
+                })
             })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setTeachers(_.sortBy(res.data.users, 'lastName'));
-            })
-            .catch(err => console.log(err));
+                .then(res => res.json())
+                .then(res => {
+                    setTeachers(_.sortBy(res.data.users, 'lastName'));
+                })
+                .catch(err => console.log(err));
+        }
     }, []);
+
+    console.log(teachers)
+    console.log(selectedTeacherId)
 
     const normFile = (event) => {
         if (event && event.target && event.target.files) {
@@ -142,6 +156,7 @@ const AddSection = (props) => {
     };
 
     const handleSaveSection = async (sectionParams: sectionParams, students: readonly student[]) => {
+        console.log(sectionParams)
         const addSection = async () => {
             const id = generateId('section');
             const { name, adviserId } = sectionParams;
