@@ -1,6 +1,7 @@
 import gts from '@graphql-tools/schema';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import _ from 'lodash';
 
 import User from '../models/User.js';
 import Section from '../models/Section.js';
@@ -40,7 +41,9 @@ type Query {
   me: User
   user(id: String!): User
   users(filter: UserInput): [User]
+  studentsBySectionId(id: String!): [User]
   sections: [Section]
+  section(id: String!): Section
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -132,6 +135,26 @@ const resolvers = {
       };
       return await protectEndpoint(context, ['admin', 'schoolAdmin'], callback);
     },
+    studentsBySectionId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const section = await Section.findOne({ id: args.id });
+          if (section) {
+            const students = await User.find({});
+            const filteredStudents = _.filter(students, student => {
+              return student.role.sectionId && student.role.sectionId.toString() == section._id.toString();
+            });
+            return filteredStudents;
+          } else {
+            throw new Error('Section not found');
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
     sections: async (root, args, context) => {
       const callback = async () => {
         try {
@@ -144,6 +167,25 @@ const resolvers = {
               }
             }
             return sections;
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    section: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const section = await Section.findOne({ id: args.id});
+          if (section) {
+            const adviser = await User.findById(section.adviserId).exec();
+            if (adviser) {
+              section.adviserId = adviser;
+            }
+            return section;
+          } else {
+            throw new Error('Section not found');
           }
         } catch (err) {
           throw new Error(err);

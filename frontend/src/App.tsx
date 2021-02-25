@@ -15,6 +15,7 @@ import AddSection from './views/schoolAdmin/AddSection';
 import Teachers from './views/schoolAdmin/Teachers';
 import AddTeacher from './views/schoolAdmin/AddTeacher';
 import Login from './views/universal/Login';
+import Section from './views/teacher/Section';
 import Header from './components/Header';
 
 import { User } from './interfaces';
@@ -69,6 +70,7 @@ function App() {
               {user ?
                 <>
                   <Route path='/sections' component={Sections} />
+                  <Route path='/section' component={Section} />
                   <Route path='/addSection' component={AddSection} />
                   <Route path='/users' component={Users} />
                   <Route path='/addUser' component={AddUser} />

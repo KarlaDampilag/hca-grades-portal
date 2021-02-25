@@ -7,6 +7,7 @@ interface Properties {
     columns: ColumnsType<any>,
     pagination?: object,
     footer?: (currentPageData) => JSX.Element
+    onRow?: (record, rowIndex) => {}
 }
 
 const DataTable = (props: Properties) => {
@@ -16,6 +17,7 @@ const DataTable = (props: Properties) => {
             columns={props.columns}
             pagination={props.pagination}
             footer={props.footer}
+            onRow={props.onRow}
         />
     )
 }

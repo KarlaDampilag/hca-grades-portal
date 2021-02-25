@@ -16,6 +16,7 @@ const Sections = (props: Properties) => {
         const query = `
         query {
             sections {
+                id
                 name
                 adviserId {
                     firstName
@@ -52,6 +53,9 @@ const Sections = (props: Properties) => {
                         title: 'Name',
                         dataIndex: 'name',
                         key: 'name',
+                        render: (name, record) => {
+                            return <Link to={`/section?id=${record.id}`}>{`${name}`}</Link>;
+                        }
                     },
                     {
                         title: 'Adviser',
