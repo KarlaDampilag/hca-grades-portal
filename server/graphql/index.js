@@ -138,9 +138,7 @@ const resolvers = {
           const sections = await Section.find({}).exec();
           if (sections) {
             for (const section of sections) {
-              console.log('id', section.adviserId);
               const adviser = await User.findById(section.adviserId).exec();
-              console.log(adviser);
               if (adviser) {
                 section.adviserId = adviser;
               }
