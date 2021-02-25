@@ -1,9 +1,7 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { Button } from 'antd';
 
 const LogoutButton = () => {
-    const history = useHistory();
 
     const logout = async () => {
         const query = `
@@ -32,7 +30,6 @@ const LogoutButton = () => {
             onClick={async () => {
                 await logout();
                 window.location.reload();
-                // history.push('/');
             }}
         >
             Logout

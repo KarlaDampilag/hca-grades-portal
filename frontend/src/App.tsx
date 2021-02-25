@@ -14,7 +14,8 @@ import Sections from './views/schoolAdmin/Sections';
 import AddSection from './views/schoolAdmin/AddSection';
 import Teachers from './views/schoolAdmin/Teachers';
 import AddTeacher from './views/schoolAdmin/AddTeacher';
-import Home from './views/Home';
+import Home from './views/universal/Home';
+import Login from './views/universal/Login';
 import Header from './components/Header';
 
 import { User } from './interfaces';
@@ -60,21 +61,21 @@ function App() {
       </header>
       <div className='App-body'>
         <Card>
-          {user ?
-            <>
-              <Switch>
+          <Switch>
+            <Route path='/login' component={() => <Login user={user} />} />
+            {user ?
+              <>
                 <Route path='/sections' component={Sections} />
                 <Route path='/addSection' component={AddSection} />
                 <Route path='/users' component={Users} />
                 <Route path='/addUser' component={AddUser} />
                 <Route path='/teachers' component={Teachers} />
                 <Route path='/addTeacher' component={AddTeacher} />
-                <Route path='/' component={Home} />
-              </Switch>
-            </> : <>
-              <p>Please log in to use this application.</p>
-            </>
-          }
+              </> : <>
+                <p>Please log in to use this application.</p>
+              </>
+            }
+          </Switch>
         </Card>
       </div>
     </div>

@@ -43,3 +43,7 @@ code {
   max-width: 900px;
   padding-top: 30px;
 }
+
+.form-submit {
+  width: 100%;
+}
