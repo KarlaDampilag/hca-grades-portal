@@ -5,11 +5,11 @@ import { Form, Input, Button, message } from 'antd';
 import { MyContext } from './../../App';
 
 const layout = {
-    labelCol: { span: 3 },
-    wrapperCol: { span: 21 },
+    labelCol: { span: 4 },
+    wrapperCol: { span: 20 },
 };
 const tailLayout = {
-    wrapperCol: { offset: 3, span: 21 },
+    wrapperCol: { offset: 4, span: 20 },
 };
 
 const Login = () => {
@@ -69,7 +69,7 @@ const Login = () => {
         <>
             <Form
                 {...layout}
-                style={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}
+                style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}
                 onFinish={handleFormSubmit}
             >
                 <h1>Login</h1>
