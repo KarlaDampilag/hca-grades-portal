@@ -13,7 +13,22 @@ export interface Role {
 }
 
 export interface Section {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
     adviser: User
+}
+
+export interface MyClass {
+    id: string,
+    name: string,
+    teacherId: User,
+    sectionId: Section
+}
+
+export interface Grade {
+    id: string,
+    studentId: string,
+    scores: any,
+    classId: string,
+    quarter: number
 }

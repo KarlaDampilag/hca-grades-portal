@@ -15,13 +15,17 @@ import AddSection from './views/schoolAdmin/AddSection';
 import Teachers from './views/schoolAdmin/Teachers';
 import AddTeacher from './views/schoolAdmin/AddTeacher';
 import Login from './views/universal/Login';
-import Section from './views/teacher/Section';
+import SectionView from './views/teacher/Section';
+import Grade from './views/teacher/Grade';
+import AddGrade from './views/teacher/AddGrade';
+import Classes from './views/teacher/Classes';
 import Header from './components/Header';
 
-import { User } from './interfaces';
+import { User, Section } from './interfaces';
 
 function App() {
   const [user, setUser] = React.useState<User>();
+  const [sections, setSections] = React.useState<readonly Section[]>();
 
   React.useEffect(() => {
     const query = `
@@ -53,11 +57,42 @@ function App() {
         setUser(res.data.me);
       })
       .catch(err => console.log(err));
+
+      const sectionQuery = `
+        query {
+            sections {
+                id
+                name
+                adviserId {
+                    firstName
+                    lastName
+                }
+            }
+        }
+        `;
+
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                query: sectionQuery
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                setSections(res.data.sections);
+            })
+            .catch(err => console.log(err));
   }, []);
 
   return (
     <MyContext.Provider value={{
-      user: user
+      user: user,
+      sections: sections
     }}>
       <div className="App">
         <header className="App-header">
@@ -70,8 +105,11 @@ function App() {
               {user ?
                 <>
                   <Route path='/sections' component={Sections} />
-                  <Route path='/section' component={Section} />
+                  <Route path='/section' component={SectionView} />
                   <Route path='/addSection' component={AddSection} />
+                  <Route path='/classes' component={Classes} />
+                  <Route path='/grade' component={Grade} />
+                  <Route path='/addGrade' component={AddGrade} />
                   <Route path='/users' component={Users} />
                   <Route path='/addUser' component={AddUser} />
                   <Route path='/teachers' component={Teachers} />
@@ -91,7 +129,9 @@ function App() {
 export default App;
 
 export const MyContext = React.createContext<{
-  user: User | undefined
+  user: User | undefined,
+  sections: readonly Section[] | undefined
 }>({
-  user: undefined
+  user: undefined,
+  sections: undefined
 });

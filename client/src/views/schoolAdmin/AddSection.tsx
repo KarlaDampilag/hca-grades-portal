@@ -82,9 +82,6 @@ const AddSection = () => {
         }
     }, []);
 
-    console.log(teachers)
-    console.log(selectedTeacherId)
-
     const normFile = (event) => {
         if (event && event.target && event.target.files) {
             return event.target.files[0]

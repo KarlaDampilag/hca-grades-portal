@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 import User from '../models/User.js';
 import Section from '../models/Section.js';
+import Class from '../models/Class.js';
 
 const APP_SECRET = 'sdlfkj08234lksdf'; // move to env
 
@@ -28,6 +29,12 @@ type Section {
   name: String!
   adviserId: User!
 }
+type Class {
+  id: String!
+  name: String!
+  teacherId: User!
+  sectionId: Section!
+}
 input UserInput {
   id: String
   firstName: String
@@ -44,12 +51,15 @@ type Query {
   studentsBySectionId(id: String!): [User]
   sections: [Section]
   section(id: String!): Section
+  classesBySectionId(sectionId: String!): [Class]
+  class(id: String!): Class
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
   addUsers(users: [UserInput!]!): [User]
   deleteUsers: Null
   addSection(id: String!, name: String, adviserId: String!, students: [UserInput!]!): Section
+  addClass(id: String!, name: String, teacherId: String!, sectionId: String!): Class
   login(email: String!, password: String!): User
   logout: Null
 }
@@ -133,7 +143,7 @@ const resolvers = {
           throw new Error(err);
         }
       };
-      return await protectEndpoint(context, ['admin', 'schoolAdmin'], callback);
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
     },
     studentsBySectionId: async (root, args, context) => {
       const callback = async () => {
@@ -177,7 +187,7 @@ const resolvers = {
     section: async (root, args, context) => {
       const callback = async () => {
         try {
-          const section = await Section.findOne({ id: args.id});
+          const section = await Section.findOne({ id: args.id });
           if (section) {
             const adviser = await User.findById(section.adviserId).exec();
             if (adviser) {
@@ -186,6 +196,60 @@ const resolvers = {
             return section;
           } else {
             throw new Error('Section not found');
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    classesBySectionId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const section = await Section.findOne({ id: args.sectionId });
+          if (!section) {
+            throw new Error('Section not found');
+          }
+
+          const classes = await Class.find().exec();
+
+          const filteredClasses = _.filter(classes, thisClass => {
+            return thisClass.sectionId.toString() == section._id.toString();
+          });
+
+          if (filteredClasses) {
+            for (const thisClass of filteredClasses) {
+              const teacher = await User.findById(thisClass.teacherId).exec();
+              if (teacher && teacher) {
+                thisClass.teacherId = teacher;
+                thisClass.sectionId = section;
+              }
+            }
+            return filteredClasses;
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    class: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const myClass = await Class.findOne({ id: args.id });
+          if (myClass) {
+            const teacher = await User.findById(myClass.teacherId).exec();
+            const section = await Section.findById(myClass.sectionId).exec();
+            console.log(myClass.teacherId);
+            if (teacher) {
+              myClass.teacherId = teacher;
+            }
+            if (section) {
+              myClass.sectionId = section;
+            }
+            return myClass;
+          } else {
+            throw new Error('Class not found');
           }
         } catch (err) {
           throw new Error(err);
@@ -255,6 +319,30 @@ const resolvers = {
           throw new Error(err);
         }
       };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+
+    addClass: async (root, { id, name, teacherId, sectionId }, context) => {
+      const callback = async () => {
+        try {
+          const requesterId = getRequesterId(context);
+          const teacher = await User.findOne({ id: teacherId }).exec();
+          const section = await Section.findOne({ id: sectionId }).exec();
+          if (!teacher) {
+            throw new Error('Teacher not found');
+          }
+          if (!section) {
+            throw new Error('Section not found');
+          }
+          const newClass = await new Class({ id, name, teacherId: teacher._id, sectionId: section._id, createdAt: Date.now().toString(), createdBy: requesterId }).save();
+          newClass.teacherId = teacher;
+          newClass.sectionId = section;
+          return newClass;
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+
       return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
     },
 

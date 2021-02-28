@@ -51,6 +51,12 @@ const Teachers = (props: Properties) => {
                 data={teachers}
                 columns={[
                     {
+                        title: '',
+                        dataIndex: 'id',
+                        key: 'id',
+                        render: (id, record, index) => (index + 1)
+                    },
+                    {
                         title: 'Name',
                         dataIndex: 'lastName',
                         key: 'fullName',

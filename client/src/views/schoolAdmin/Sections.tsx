@@ -68,7 +68,22 @@ const Sections = (props: Properties) => {
                                 return null;
                             }
                         }
-                    }
+                    },
+                    {
+                        title: 'Student List',
+                        dataIndex: 'id',
+                        key: 'studentList',
+                        render: (id) => {
+                            return <Link to={`/section?id=${id}`}><Button>Students</Button></Link>;
+                        }
+                    },{
+                        title: 'Class List',
+                        dataIndex: 'id',
+                        key: 'classList',
+                        render: (id) => {
+                            return <Link to={`/classes?sectionId=${id}`}><Button>Classes</Button></Link>;
+                        }
+                    },
                 ]}
                 footer={(pageData) => {
                     return (

@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import DataTable from '../../components/DataTable';
 import { Section, User } from '../../interfaces';
@@ -73,14 +76,20 @@ const SectionView = (props) => {
 
     }, []);
 
-    console.log(students)
 
     return (
         <>
+            <Link to='/sections'><Button icon={<ArrowLeftOutlined />}>Return To Sections</Button></Link>
             <h1>{section?.name}</h1>
             <DataTable
                 data={students}
                 columns={[
+                    {
+                        title: '',
+                        dataIndex: 'id',
+                        key: 'id',
+                        render: (id, record, index) => (index + 1)
+                    },
                     {
                         title: 'Last Name',
                         dataIndex: 'lastName',

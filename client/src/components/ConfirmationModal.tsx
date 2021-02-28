@@ -8,7 +8,6 @@ interface Properties {
 }
 
 const ConfirmationModal = (props: Properties) => {
-    
     return (
         <Modal
             visible={props.visible}
