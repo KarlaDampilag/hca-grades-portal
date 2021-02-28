@@ -19,14 +19,45 @@ const AddGrade = (props) => {
 
     const [grades, setGrades] = React.useState<readonly Grade[]>([]);
     const [confirmationModalIsVisible, setConfirmationModalIsVisible] = React.useState<boolean>(false);
+    const [students, setStudents] = React.useState<readonly User[]>();
 
     const urlQuery = new URLSearchParams(props.location.search);
     const classId = urlQuery.get('classId');
     const quarter = urlQuery.get('quarter');
 
     React.useEffect(() => {
+        const query = `
+        query($id: String!) {
+            studentsByClassId(id: $id) {
+                id
+                firstName
+                lastName
+                middleInitial
+                email
+                role
+            }
+        }
+        `;
 
-        
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                query,
+                variables: {
+                    id: classId
+                }
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                setStudents(res.data.studentsByClassId);
+            })
+            .catch(err => console.log(err));
     }, []);
 
     const normFile = (event) => {
@@ -36,13 +67,34 @@ const AddGrade = (props) => {
     };
 
     const getStudentIdFromLRN = (lrn: string): string => {
-        return '';
+        const student = _.find(students, student => {
+            return student.role.lrn == lrn;
+        });
+
+        if (student) {
+            return student.id;
+        } else {
+            return '';
+        }
+    }
+
+    const getScoresFromJson = (jsonObject) => {
+        return {
+           ww: jsonObject.WW,
+           wwTotal: jsonObject['WW-total'],
+           pt: jsonObject.PT,
+           ptTotal: jsonObject['PT-total'],
+           qa: jsonObject.QA,
+           qaTotal: jsonObject['QA-total'],
+           initialGrade: jsonObject.initial,
+           finalGrade: jsonObject.final
+        }
     }
 
     const transformGradesFromUpload = (jsonObject): Grade => {
         const id = generateId('grade');
         const studentId: string = getStudentIdFromLRN(jsonObject.lrn);
-        const scores = {};
+        const scores = getScoresFromJson(jsonObject);
 
         return {
             id,
@@ -72,6 +124,7 @@ const AddGrade = (props) => {
                         return jsonObject;
                     }
                 });
+                console.log(filteredData)
 
                 let sheetIsValid = true;
                 const newGrades: Grade[] = [];
@@ -167,25 +220,64 @@ const AddGrade = (props) => {
                     data={grades}
                     columns={[
                         {
+                            title: '',
+                            dataIndex: 'studentId',
+                            key: 'index',
+                            render: (id, record, index) => index + 1
+                        },
+                        {
                             title: 'Student',
                             dataIndex: 'studentId',
-                            key: 'student'
+                            key: 'student',
+                            render: (studentId) => {
+                                const student = _.find(students, student => {
+                                    return student.id == studentId;
+                                });
+                                if (student) {
+                                    return `${student.lastName}, ${student.firstName} ${student.middleInitial}.`;
+                                } else {
+                                    return null;
+                                }
+                            }
                         },
                         {
-                            title: 'Class',
-                            dataIndex: 'classId',
-                            key: 'class'
+                            title: 'Written Works',
+                            dataIndex: ['scores', 'ww'],
+                            key: 'Written Works',
+                            render: (score, record) => (
+                                `${score} / ${record.scores.wwTotal}`
+                            )
                         },
                         {
-                            title: 'Quarter',
-                            dataIndex: 'quarter',
-                            key: 'quarter'
+                            title: 'Performance Task',
+                            dataIndex: ['scores', 'pt'],
+                            key: 'Performance Task',
+                            render: (score, record) => (
+                                `${score} / ${record.scores.ptTotal}`
+                            )
+                        },
+                        {
+                            title: 'QA',
+                            dataIndex: ['scores', 'qa'],
+                            key: 'QA',
+                            render: (score, record) => (
+                                `${score} / ${record.scores.qaTotal}`
+                            )
+                        },
+                        {
+                            title: 'Initial Grade',
+                            dataIndex: ['scores', 'initialGrade'],
+                            key: 'Initial Grade'
+                        },
+                        {
+                            title: 'Final Grade',
+                            dataIndex: ['scores', 'finalGrade'],
+                            key: 'Final Grade'
                         }
                     ]}
                 />
                 <Form.Item>
                     <Button type='primary' htmlType='submit' style={{ marginBottom: '10px' }}>Upload To Database</Button><br />
-                    <Link to='/sections'><Button icon={<ArrowLeftOutlined />}>Return To Sections</Button></Link>
                 </Form.Item>
             </Form>
             <ConfirmationModal
