@@ -49,6 +49,7 @@ type Query {
   user(id: String!): User
   users(filter: UserInput): [User]
   studentsBySectionId(id: String!): [User]
+  studentsByClassId(id: String!): [User]
   sections: [Section]
   section(id: String!): Section
   classesBySectionId(sectionId: String!): [Class]
@@ -143,7 +144,7 @@ const resolvers = {
           throw new Error(err);
         }
       };
-      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+      return await protectEndpoint(context, ['admin', 'schoolAdmin'], callback);
     },
     studentsBySectionId: async (root, args, context) => {
       const callback = async () => {
@@ -157,6 +158,31 @@ const resolvers = {
             return filteredStudents;
           } else {
             throw new Error('Section not found');
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    studentsByClassId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const myClass = await Class.findOne({ id: args.id });
+          if (myClass) {
+            const section = await Section.findById(myClass.sectionId);
+            if (section) {
+              const students = await User.find({});
+              const filteredStudents = _.filter(students, student => {
+                return student.role.sectionId && student.role.sectionId.toString() == section._id.toString();
+              });
+              return filteredStudents;
+            } else {
+              throw new Error('Section not found');
+            }
+          } else {
+            throw new Error('Class not found');
           }
         } catch (err) {
           throw new Error(err);
