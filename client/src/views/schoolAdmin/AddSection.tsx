@@ -153,7 +153,6 @@ const AddSection = () => {
     };
 
     const handleSaveSection = async (sectionParams: sectionParams, students: readonly student[]) => {
-        console.log(sectionParams)
         const addSection = async () => {
             const id = generateId('section');
             const { name, adviserId } = sectionParams;
