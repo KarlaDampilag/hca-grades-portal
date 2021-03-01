@@ -6,6 +6,7 @@ import _ from 'lodash';
 import User from '../models/User.js';
 import Section from '../models/Section.js';
 import Class from '../models/Class.js';
+import Grade from '../models/Grade.js';
 
 const APP_SECRET = 'sdlfkj08234lksdf'; // move to env
 
@@ -35,6 +36,14 @@ type Class {
   teacherId: User!
   sectionId: Section!
 }
+type Grade {
+  id: String!
+  studentId: User!
+  classId: Class!
+  scores: Object!
+  quarter: Int!
+}
+
 input UserInput {
   id: String
   firstName: String
@@ -44,6 +53,14 @@ input UserInput {
   password: String
   role: Object
 }
+input GradeInput {
+  id: String
+  studentId: String!
+  classId: String!
+  scores: Object!
+  quarter: Int!
+}
+
 type Query {
   me: User
   user(id: String!): User
@@ -54,6 +71,7 @@ type Query {
   section(id: String!): Section
   classesBySectionId(sectionId: String!): [Class]
   class(id: String!): Class
+  gradesByClassId(classId: String!): [Grade]
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -61,6 +79,8 @@ type Mutation {
   deleteUsers: Null
   addSection(id: String!, name: String, adviserId: String!, students: [UserInput!]!): Section
   addClass(id: String!, name: String, teacherId: String!, sectionId: String!): Class
+  addGrade(id: String!, studentId: String!, classId: String!, scores: Object!, quarter: Int!): Grade
+  addGrades(grades: [GradeInput!]!): [Grade]
   login(email: String!, password: String!): User
   logout: Null
 }
@@ -113,6 +133,26 @@ const createUser = async (context, id, firstName, lastName, middleInitial, email
     if (user) {
       return user;
     }
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const createGrade = async (context, id, studentId, classId, scores, quarter) => {
+  try {
+    const requesterId = getRequesterId(context);
+    const student = await User.findOne({ id: studentId }).exec();
+    const myClass = await Class.findOne({ id: classId }).exec();
+    if (!student) {
+      throw new Error('Student not found');
+    }
+    if (!myClass) {
+      throw new Error('Class not found');
+    }
+    const grade = await new Grade({ id, studentId: student._id, classId: myClass._id, scores, quarter, createdAt: Date.now().toString(), createdBy: requesterId }).save();
+    grade.studentId = student;
+    grade.classId = myClass;
+    return grade;
   } catch (err) {
     throw new Error(err);
   }
@@ -246,12 +286,12 @@ const resolvers = {
           if (filteredClasses) {
             for (const thisClass of filteredClasses) {
               const teacher = await User.findById(thisClass.teacherId).exec();
-              if (teacher && teacher) {
-                thisClass.teacherId = teacher;
-                thisClass.sectionId = section;
-              }
+              thisClass.teacherId = teacher;
+              thisClass.sectionId = section;
             }
             return filteredClasses;
+          } else {
+            return [];
           }
         } catch (err) {
           throw new Error(err);
@@ -266,7 +306,6 @@ const resolvers = {
           if (myClass) {
             const teacher = await User.findById(myClass.teacherId).exec();
             const section = await Section.findById(myClass.sectionId).exec();
-            console.log(myClass.teacherId);
             if (teacher) {
               myClass.teacherId = teacher;
             }
@@ -276,6 +315,37 @@ const resolvers = {
             return myClass;
           } else {
             throw new Error('Class not found');
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    gradesByClassId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const myClass = await Class.findOne({ id: args.classId });
+
+          if (!myClass) {
+            throw new Error('Class not found');
+          }
+
+          const grades = await Grade.find().exec();
+
+          const filteredGrades = _.filter(grades, grade => {
+            return grade.classId.toString() == myClass._id.toString();
+          });
+
+          if (filteredGrades) {
+            for (const grade of filteredGrades) {
+              const student = await User.findById(grade.studentId);
+              grade.studentId = student;
+              grade.classId = myClass;
+            }
+            return filteredGrades;
+          } else {
+            return [];
           }
         } catch (err) {
           throw new Error(err);
@@ -368,7 +438,26 @@ const resolvers = {
           throw new Error(err);
         }
       };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
 
+    addGrade: async (root, { id, studentId, classId, scores, quarter }, context) => {
+      const callback = async () => {
+        return await createGrade(context, id, studentId, classId, scores, quarter);
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+
+    addGrades: async (root, { grades }, context) => {
+      const callback = async () => {
+        const newGrades = [];
+        for (const grade of grades) {
+          const { id, studentId, classId, scores, quarter } = grade;
+          const newGrade = await createGrade(context, id, studentId, classId, scores, quarter);
+          newGrades.push(newGrade);
+        }
+        return newGrades;
+      };
       return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
     },
 

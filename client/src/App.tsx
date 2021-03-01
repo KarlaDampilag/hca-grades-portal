@@ -16,7 +16,7 @@ import Teachers from './views/schoolAdmin/Teachers';
 import AddTeacher from './views/schoolAdmin/AddTeacher';
 import Login from './views/universal/Login';
 import SectionView from './views/teacher/Section';
-import Grade from './views/teacher/Grade';
+import GradeView from './views/teacher/GradeView';
 import AddGrade from './views/teacher/AddGrade';
 import Classes from './views/teacher/Classes';
 import Header from './components/Header';
@@ -108,7 +108,7 @@ function App() {
                   <Route path='/section' component={SectionView} />
                   <Route path='/addSection' component={AddSection} />
                   <Route path='/classes' component={Classes} />
-                  <Route path='/grade' component={Grade} />
+                  <Route path='/grade' component={GradeView} />
                   <Route path='/addGrade' component={AddGrade} />
                   <Route path='/users' component={Users} />
                   <Route path='/addUser' component={AddUser} />

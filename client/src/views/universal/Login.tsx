@@ -57,7 +57,7 @@ const Login = () => {
             .then(res => res.json())
             .then(res => {
                 if (res.errors) {
-                    message.error(res.errors[0].message, 5);
+                    message.error(res.errors[0].message, 7);
                 }
                 if (res && res.data && res.data.login) {
                     window.location.reload();

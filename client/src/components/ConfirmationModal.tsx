@@ -15,6 +15,7 @@ const ConfirmationModal = (props: Properties) => {
                 <Button key='cancel' onClick={props.onCancel}>Cancel</Button>,
                 <Button key='confirm' type='primary' onClick={props.onConfirm}>Confirm</Button>
             ]}
+            onCancel={props.onCancel}
         >
             <span>Are you sure? This action is final.</span>
         </Modal>

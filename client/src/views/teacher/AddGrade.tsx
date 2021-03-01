@@ -5,8 +5,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import * as _ from 'lodash';
 
-import { generateId, generateUsername, generatePassword } from '../../utils/utils';
-import { User, Grade } from '../../interfaces';
+import { generateId, getQuarterNumber } from '../../utils/utils';
+import { User, Grade, MyClass } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
@@ -17,6 +17,8 @@ const AddGrade = (props) => {
     const context = React.useContext(MyContext);
     const { user } = context;
 
+    const [myClass, setMyClass] = React.useState<MyClass>();
+    const [quarterNumber, setQuarterNumber] = React.useState<string>('');
     const [grades, setGrades] = React.useState<readonly Grade[]>([]);
     const [confirmationModalIsVisible, setConfirmationModalIsVisible] = React.useState<boolean>(false);
     const [students, setStudents] = React.useState<readonly User[]>();
@@ -58,6 +60,45 @@ const AddGrade = (props) => {
                 setStudents(res.data.studentsByClassId);
             })
             .catch(err => console.log(err));
+
+        const classQuery = `
+        query($id: String!) {
+            class(id: $id) {
+                id
+                name
+                teacherId {
+                    firstName
+                    lastName
+                }
+                sectionId {
+                    id
+                    name
+                }
+            }
+        }
+        `;
+
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                query: classQuery,
+                variables: {
+                    id: classId
+                }
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                setMyClass(res.data.class);
+            })
+            .catch(err => console.log(err));
+
+        setQuarterNumber(getQuarterNumber(quarter));
     }, []);
 
     const normFile = (event) => {
@@ -80,14 +121,14 @@ const AddGrade = (props) => {
 
     const getScoresFromJson = (jsonObject) => {
         return {
-           ww: jsonObject.WW,
-           wwTotal: jsonObject['WW-total'],
-           pt: jsonObject.PT,
-           ptTotal: jsonObject['PT-total'],
-           qa: jsonObject.QA,
-           qaTotal: jsonObject['QA-total'],
-           initialGrade: jsonObject.initial,
-           finalGrade: jsonObject.final
+            ww: jsonObject.WW,
+            wwTotal: jsonObject['WW-total'],
+            pt: jsonObject.PT,
+            ptTotal: jsonObject['PT-total'],
+            qa: jsonObject.QA,
+            qaTotal: jsonObject['QA-total'],
+            initialGrade: jsonObject.initial,
+            finalGrade: jsonObject.final
         }
     }
 
@@ -147,61 +188,59 @@ const AddGrade = (props) => {
         reader.readAsBinaryString(file);
     };
 
-    // const handleSaveSection = async (grades: readonly Grade[]) => {
-    //     console.log(grades)
-    //     const addSection = async () => {
-    //         const id = generateId('section');
-    //         const { name, adviserId } = grades;
-    //         const args = {
-    //             id,
-    //             name,
-    //             adviserId,
-    //         }
-    //         const addSectionQuery = `
-    //             mutation($id: String!, $name: String!, $adviserId: String!, $students: [UserInput!]!) {
-    //                 addSection(id: $id, name: $name, adviserId: $adviserId, students: $students) {
-    //                     name
-    //                 }
-    //             }
-    //             `;
+    const handleSaveSection = async (grades: readonly Grade[]) => {
+        const addGrade = async () => {
+            const query = `
+                mutation($grades: [GradeInput!]!) {
+                    addGrades(grades: $grades) {
+                        id
+                    }
+                }
+                `;
 
-    //         fetch('http://localhost:4000/graphql', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Accept': 'application/json'
-    //             },
-    //             credentials: 'include',
-    //             body: JSON.stringify({
-    //                 query: addSectionQuery,
-    //                 variables: args
-    //             })
-    //         })
-    //             .then(res => res.json())
-    //             .then(res => {
-    //                 console.log(res);
-    //             })
-    //             .catch(err => console.log(err));
-    //     }
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query,
+                    variables: { grades }
+                })
+            })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.errors) {
+                        message.error(res.errors[0].message, 7);
+                    }
+                    if (res && res.data && res.data.addGrades) {
+                        message.success('Grades are succesfully uploaded', 5);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
 
-    //     await addSection();
-    //     setConfirmationModalIsVisible(false);
-    //     message.success('Section and students are succesfully added', 5);
+        await addGrade();
+        setConfirmationModalIsVisible(false);
 
-    //     // auto download excel file with passwords
-    //     /* make the worksheet */
-    //     var ws = XLSX.utils.json_to_sheet([...students]);
-    //     /* add to workbook */
-    //     var wb = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(wb, ws, "Students");
-    //     /* write workbook */
-    //     XLSX.writeFile(wb, `${sectionParams.name}-generated.xlsx`);
-    // }
+
+        // auto download excel file with passwords
+        /* make the worksheet */
+        // var ws = XLSX.utils.json_to_sheet([...grades]);
+        // /* add to workbook */
+        // var wb = XLSX.utils.book_new();
+        // XLSX.utils.book_append_sheet(wb, ws, "Students");
+        // /* write workbook */
+        // XLSX.writeFile(wb, `Grades-generated.xlsx`);
+    }
 
     return (
         <>
             <Link to={`/grade?classId=${classId}&quarter=${quarter}`}><Button icon={<ArrowLeftOutlined />}>Return To Grade</Button></Link>
-            <h1></h1>
+            <h1>{`${quarterNumber} Quarter - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
+            <p style={{ color: '#f54c4c' }}>Confirming your upload will overwrite any currently saved grades in the database.</p>
             <Form
                 onFinish={() => setConfirmationModalIsVisible(true)}
             >
@@ -283,12 +322,7 @@ const AddGrade = (props) => {
             <ConfirmationModal
                 visible={confirmationModalIsVisible}
                 onConfirm={async () => {
-                    // await handleSaveSection({
-                    //     name: sectionName,
-                    //     adviserId: selectedTeacherId
-                    // },
-                    //     students
-                    // );
+                    await handleSaveSection(grades);
                 }}
                 onCancel={() => setConfirmationModalIsVisible(false)}
             />
