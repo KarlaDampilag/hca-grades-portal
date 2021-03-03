@@ -71,7 +71,7 @@ type Query {
   section(id: String!): Section
   classesBySectionId(sectionId: String!): [Class]
   class(id: String!): Class
-  gradesByClassId(classId: String!): [Grade]
+  gradesByClassId(classId: String!, quarter: Int!): [Grade]
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -331,13 +331,9 @@ const resolvers = {
             throw new Error('Class not found');
           }
 
-          const grades = await Grade.find().exec();
+          const filteredGrades = await Grade.find({ classId: myClass._id, quarter: args.quarter }).exec();
 
-          const filteredGrades = _.filter(grades, grade => {
-            return grade.classId.toString() == myClass._id.toString();
-          });
-
-          if (filteredGrades) {
+          if (!_.isEmpty(filteredGrades)) {
             for (const grade of filteredGrades) {
               const student = await User.findById(grade.studentId);
               grade.studentId = student;
@@ -449,7 +445,6 @@ const resolvers = {
     },
 
     addGrades: async (root, { grades }, context) => {
-      // TODO you stopped here! Delete any grades for that class first!
       const callback = async () => {
         const classId = grades[0].classId;
         const myClass = await Class.findOne({ id: classId });

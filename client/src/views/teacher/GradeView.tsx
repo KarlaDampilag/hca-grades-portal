@@ -57,8 +57,8 @@ const GradeView = (props) => {
             .catch(err => console.log(err));
 
         const gradesQuery = `
-            query($classId: String!) {
-                gradesByClassId(classId: $classId) {
+            query($classId: String!, $quarter: Int!) {
+                gradesByClassId(classId: $classId, quarter: $quarter) {
                     id
                     studentId {
                         firstName
@@ -81,7 +81,8 @@ const GradeView = (props) => {
             body: JSON.stringify({
                 query: gradesQuery,
                 variables: {
-                    classId: id
+                    classId: id,
+                    quarter: parseInt(quarter as string)
                 }
             })
         })
