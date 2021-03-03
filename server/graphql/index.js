@@ -449,7 +449,12 @@ const resolvers = {
     },
 
     addGrades: async (root, { grades }, context) => {
+      // TODO you stopped here! Delete any grades for that class first!
       const callback = async () => {
+        const classId = grades[0].classId;
+        const myClass = await Class.findOne({ id: classId });
+        await Grade.deleteMany({ classId: myClass._id });
+
         const newGrades = [];
         for (const grade of grades) {
           const { id, studentId, classId, scores, quarter } = grade;

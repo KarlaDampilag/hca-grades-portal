@@ -165,7 +165,6 @@ const AddGrade = (props) => {
                         return jsonObject;
                     }
                 });
-                console.log(filteredData)
 
                 let sheetIsValid = true;
                 const newGrades: Grade[] = [];
@@ -177,7 +176,6 @@ const AddGrade = (props) => {
                         sheetIsValid = false;
                     }
                 };
-                console.log(newGrades)
                 if (sheetIsValid) {
                     setGrades(newGrades);
                 } else {
