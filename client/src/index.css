@@ -34,7 +34,8 @@ code {
 
 .App-header,
 .App-body {
-  max-width: 1200px;
+  max-width: 1400px;
+  width: 100%;
 }
 .App-header {
   position: relative;
@@ -49,4 +50,25 @@ code {
 
 .form-submit {
   width: 100%;
+}
+
+table {
+  table-layout: fixed;
+  width: 200%;
+}
+.table-wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+#welcome {
+  position: 'absolute';
+  right: 0;
+  padding-right: '20px';
+}
+
+@media only screen and (min-width: 400px) {
+  #welcome {
+    display: none;
+  }
 }
