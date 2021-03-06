@@ -18,6 +18,7 @@ import Login from './views/universal/Login';
 import SectionView from './views/teacher/Section';
 import GradeView from './views/teacher/GradeView';
 import AddGrade from './views/teacher/AddGrade';
+import FinalGrades from './views/teacher/FinalGrades';
 import Classes from './views/teacher/Classes';
 import Header from './components/Header';
 
@@ -110,6 +111,7 @@ function App() {
                   <Route path='/classes' component={Classes} />
                   <Route path='/grade' component={GradeView} />
                   <Route path='/addGrade' component={AddGrade} />
+                  <Route path='/finalGrades' component={FinalGrades} />
                   <Route path='/users' component={Users} />
                   <Route path='/addUser' component={AddUser} />
                   <Route path='/teachers' component={Teachers} />

@@ -5,23 +5,51 @@ import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 
-import { MyClass, Grade, } from '../../interfaces';
+import { MyClass, Grade, User } from '../../interfaces';
 import DataTable from '../../components/DataTable';
-import { getQuarterNumber } from '../../utils/utils';
 
-import { MyContext } from '../../App';
+interface FinalGrade {
+    student: User,
+    1: number,
+    2: number,
+    3: number,
+    4: number
+}
 
-const GradeView = (props) => {
-    const context = React.useContext(MyContext);
-    const { user } = context;
+const getFinalGrades = (grades: Grade[]): FinalGrade[] => {
+    const finalGrades: FinalGrade[] = [];
+    _.each(grades, rawGrade => {
+        const finalGrade = _.find(finalGrades, grade => {
+            return rawGrade.studentId.id == grade.student.id;
+        });
+        if (finalGrade) {
+            finalGrade[rawGrade.quarter] = rawGrade.scores.finalGrade;
+        } else {
+            const newFinalGrade: FinalGrade = {
+                student: rawGrade.studentId,
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0
+            };
+            newFinalGrade[rawGrade.quarter] = rawGrade.scores.finalGrade;
+            finalGrades.push(newFinalGrade);
+        }
+    });
+    return finalGrades;
+}
 
+// TODO unconfirmed formula
+const getFinalGrade = (grade: FinalGrade): number =>  {
+    return (grade['1'] + grade['2'] + grade['3'] + grade['4']) / 4;
+}
+
+const FinalGrades = (props) => {
     const [myClass, setMyClass] = React.useState<MyClass>();
-    const [quarterNumber, setQuarterNumber] = React.useState<string>('');
-    const [grades, setGrades] = React.useState<readonly Grade[]>();
+    const [grades, setGrades] = React.useState<readonly FinalGrade[]>();
 
     const urlQuery = new URLSearchParams(props.location.search);
     const id = urlQuery.get('classId');
-    const quarter = urlQuery.get('quarter');
 
     React.useEffect(() => {
         const classQuery = `
@@ -63,10 +91,11 @@ const GradeView = (props) => {
             .catch(err => console.log(err));
 
         const gradesQuery = `
-            query($classId: String!, $quarter: Int) {
-                gradesByClassId(classId: $classId, quarter: $quarter) {
+            query($classId: String!) {
+                gradesByClassId(classId: $classId) {
                     id
                     studentId {
+                        id
                         firstName
                         lastName
                         middleInitial
@@ -87,47 +116,36 @@ const GradeView = (props) => {
             body: JSON.stringify({
                 query: gradesQuery,
                 variables: {
-                    classId: id,
-                    quarter: parseInt(quarter as string)
+                    classId: id
                 }
             })
         })
             .then(res => res.json())
             .then(res => {
-                setGrades(res.data.gradesByClassId);
+                setGrades(getFinalGrades(res.data.gradesByClassId));
+                // setGrades(res.data.gradesByClassId);
             })
             .catch(err => console.log(err));
 
-        setQuarterNumber(getQuarterNumber(quarter));
     }, []);
-
-    const userCanUploadGrade = () => {
-        let ret = false;
-        if (user?.role.type == 'admin' || user?.role.type == 'schoolAdmin') {
-            ret = true;
-        } else if (myClass?.teacherId.id == user?.id) {
-            ret = true;
-        }
-        return ret;
-    }
 
     return (
         <>
             <Link to={`/classes?sectionId=${myClass?.sectionId?.id}`}><Button icon={<ArrowLeftOutlined />}>Return To Classes</Button></Link>
-            <h1>{`${quarterNumber} Quarter - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
+            <h1>{`Final grades - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
             <DataTable
                 data={grades}
                 columns={[
                     {
                         title: '',
-                        dataIndex: 'studentId',
+                        dataIndex: 'student',
                         key: 'index',
                         render: (id, record, index) => index + 1
                     },
                     {
                         title: 'Student',
                         key: 'student',
-                        dataIndex: 'studentId',
+                        dataIndex: 'student',
                         render: (student) => {
                             if (student) {
                                 return `${student.lastName}, ${student.firstName} ${student.middleInitial}.`;
@@ -137,55 +155,37 @@ const GradeView = (props) => {
                         }
                     },
                     {
-                        title: 'Written Works',
-                        dataIndex: ['scores', 'ww'],
-                        key: 'Written Works',
-                        render: (score, record) => (
-                            `${score} / ${record.scores.wwTotal}`
-                        )
+                        title: '1st Quarter',
+                        dataIndex: '1',
+                        key: '1st-quarter'
                     },
                     {
-                        title: 'Performance Task',
-                        dataIndex: ['scores', 'pt'],
-                        key: 'Performance Task',
-                        render: (score, record) => (
-                            `${score} / ${record.scores.ptTotal}`
-                        )
+                        title: '2nd Quarter',
+                        dataIndex: '2',
+                        key: '2nd-quarter'
                     },
                     {
-                        title: 'QA',
-                        dataIndex: ['scores', 'qa'],
-                        key: 'QA',
-                        render: (score, record) => (
-                            `${score} / ${record.scores.qaTotal}`
-                        )
+                        title: '3rd Quarter',
+                        dataIndex: '3',
+                        key: '3rd-quarter'
                     },
                     {
-                        title: 'Initial Grade',
-                        dataIndex: ['scores', 'initialGrade'],
-                        key: 'Initial Grade'
+                        title: '4th Quarter',
+                        dataIndex: '4',
+                        key: '4th-quarter'
                     },
                     {
                         title: 'Final Grade',
-                        dataIndex: ['scores', 'finalGrade'],
-                        key: 'Final Grade'
-                    }
+                        dataIndex: 'student',
+                        key: 'final-grade',
+                        render: (value, record) => {
+                            return getFinalGrade(record);
+                        }
+                    },
                 ]}
-                footer={(pageData) => {
-                    return (
-                        <Button type='primary' disabled={!userCanUploadGrade()}>
-                            <Link
-                                to={`/addGrade?classId=${myClass?.id}&quarter=${quarter}`}
-                                style={{ display: 'block' }}
-                            >
-                                Upload Grades
-                            </Link>
-                        </Button>
-                    )
-                }}
             />
         </>
     );
 }
 
-export default GradeView;
+export default FinalGrades;

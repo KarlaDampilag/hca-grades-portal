@@ -171,6 +171,14 @@ const Classes = (props) => {
                             return <Link to={`/grade?classId=${id}&quarter=4`}><Button>4th Quarter</Button></Link>;
                         }
                     },
+                    {
+                        title: '',
+                        dataIndex: 'id',
+                        key: 'finale-grades',
+                        render: (id) => {
+                            return <Link to={`/finalGrades?classId=${id}`}><Button>Final Grades</Button></Link>;
+                        }
+                    },
                 ]}
                 footer={(pageData) => {
                     return (

@@ -72,7 +72,7 @@ type Query {
   classes: [Class]
   classesBySectionId(sectionId: String!): [Class]
   class(id: String!): Class
-  gradesByClassId(classId: String!, quarter: Int!): [Grade]
+  gradesByClassId(classId: String!, quarter: Int): [Grade]
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -359,7 +359,13 @@ const resolvers = {
             throw new Error('Class not found');
           }
 
-          const filteredGrades = await Grade.find({ classId: myClass._id, quarter: args.quarter }).exec();
+          let filteredGrades = [];
+          
+          if (args.quarter) {
+            filteredGrades = await Grade.find({ classId: myClass._id, quarter: args.quarter }).exec();
+          } else {
+            filteredGrades = await Grade.find({ classId: myClass._id}).exec();
+          }
 
           if (!_.isEmpty(filteredGrades)) {
             for (const grade of filteredGrades) {
