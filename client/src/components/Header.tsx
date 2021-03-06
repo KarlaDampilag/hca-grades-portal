@@ -52,12 +52,12 @@ const Header = () => {
                                     <Menu.Item key='grade'><Link to='/grade'>Grade</Link></Menu.Item>
                                 </>
                             }
-                            <Menu.Item><LogoutButton /></Menu.Item>
-                            <span style={{ position: 'absolute', right: 0, paddingRight: '20px' }}>{`Welcome, ${user.firstName} ${user.lastName}!`}</span>
+                            <LogoutButton />
+                            <span id='welcome'>{`Welcome, ${user.firstName} ${user.lastName}!`}</span>
                         </> :
                         <>
-                            <Menu.Item><Link to="/signup">Sign Up</Link></Menu.Item>
-                            <Menu.Item><Link to="/login">Log In</Link></Menu.Item>
+                            <Link to="/signup">Sign Up</Link>
+                            <Link to="/login">Log In</Link>
                         </>
                 }
             </Menu>

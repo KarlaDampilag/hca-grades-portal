@@ -75,13 +75,15 @@ export const getColumnSearchProps = (
 
 const DataTable = (props: Properties) => {
     return (
-        <Table
-            dataSource={props.data}
-            columns={props.columns}
-            pagination={props.pagination}
-            footer={props.footer}
-            onRow={props.onRow}
-        />
+        <div className='table-wrapper'>
+            <Table
+                dataSource={props.data}
+                columns={props.columns}
+                pagination={props.pagination}
+                footer={props.footer}
+                onRow={props.onRow}
+            />
+        </div>
     )
 }
 
