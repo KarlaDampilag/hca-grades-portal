@@ -1,16 +1,22 @@
 import React from 'react';
+import * as _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Button } from 'antd';
+import { Button, Radio } from 'antd';
 
 import { Section } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
 
+import { MyContext } from '../../App';
 
 interface Properties { }
 
 const Sections = (props: Properties) => {
-    const [sections, setSections] = React.useState<readonly Section[]>();
+    const context = React.useContext(MyContext);
+    const { user } = context;
+
+    const [sections, setSections] = React.useState<readonly Section[]>([]);
+    const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('mine');
 
     React.useEffect(() => {
         const query = `
@@ -19,6 +25,7 @@ const Sections = (props: Properties) => {
                 id
                 name
                 adviserId {
+                    id
                     firstName
                     lastName
                 }
@@ -44,10 +51,24 @@ const Sections = (props: Properties) => {
             .catch(err => console.log(err));
     }, []);
 
+    let finalSections: Section[] = [];
+    if (sectionFilter == 'mine') {
+        const filteredSections = _.filter(sections, section => {
+            return section.adviserId.id == user?.id;
+        });
+        finalSections = [...filteredSections];
+    } else if (sectionFilter == 'all') {
+        finalSections = [...sections];
+    }
+
     return (
         <>
+            <Radio.Group onChange={(e) => setSectionFilter(e.target.value)} value={sectionFilter}>
+                <Radio value='all'>All</Radio>
+                <Radio value='mine'>My Section</Radio>
+            </Radio.Group>
             <DataTable
-                data={sections}
+                data={finalSections}
                 columns={[
                     {
                         title: 'Name',
@@ -76,7 +97,7 @@ const Sections = (props: Properties) => {
                         render: (id) => {
                             return <Link to={`/section?id=${id}`}><Button>Students</Button></Link>;
                         }
-                    },{
+                    }, {
                         title: 'Class List',
                         dataIndex: 'id',
                         key: 'classList',
