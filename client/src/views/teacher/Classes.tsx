@@ -1,10 +1,10 @@
 import React from 'react';
 import * as _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Button, Radio, Input } from 'antd';
+import { Button, Radio } from 'antd';
 
 
-import { Section, User, MyClass } from '../../interfaces';
+import { MyClass } from '../../interfaces';
 import DataTable, { getColumnSearchProps, customSorter } from '../../components/DataTable';
 import AddClassModal from '../../components/AddClassModal';
 
@@ -14,43 +14,13 @@ const Classes = (props) => {
     const context = React.useContext(MyContext);
     const { user } = context;
 
-    // const [section, setSection] = React.useState<Section>();
     const [classes, setClasses] = React.useState<readonly MyClass[]>([]);
     const [filter, setFilter] = React.useState<'mine' | 'all'>('mine');
 
     const urlQuery = new URLSearchParams(props.location.search);
-    const sectionId = urlQuery.get('sectionId')
+    const sectionId = urlQuery.get('sectionId') || undefined;
 
     React.useEffect(() => {
-        // const sectionQuery = `
-        // query($id: String!) {
-        //     section(id: $id) {
-        //         id
-        //         name
-        //     }
-        // }
-        // `;
-
-        // fetch('http://localhost:4000/graphql', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': 'application/json'
-        //     },
-        //     credentials: 'include',
-        //     body: JSON.stringify({
-        //         query: sectionQuery,
-        //         variables: {
-        //             id: sectionId
-        //         }
-        //     })
-        // })
-        //     .then(res => res.json())
-        //     .then(res => {
-        //         setSection(res.data.section);
-        //     })
-        //     .catch(err => console.log(err));
-
         const classesQuery = `
         query {
             classes {
@@ -202,11 +172,11 @@ const Classes = (props) => {
                         }
                     },
                 ]}
-                // footer={(pageData) => {
-                //     return (
-                //         <AddClassModal sectionId={sectionId} />
-                //     )
-                // }}
+                footer={(pageData) => {
+                    return (
+                        <AddClassModal sectionId={sectionId} />
+                    )
+                }}
             />
         </>
     );

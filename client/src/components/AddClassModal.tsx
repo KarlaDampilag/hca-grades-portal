@@ -7,19 +7,51 @@ import { MyContext } from './../App';
 import { generateId } from '../utils/utils';
 
 interface Properties {
-    section: Section | undefined
+    sectionId?: string
 }
 
 const AddClassModal = (props: Properties) => {
     const context = React.useContext(MyContext);
     const { user } = context;
 
+    const [sections, setSections] = React.useState<readonly Section[]>();
     const [isVisible, setIsVisible] = React.useState<boolean>(false);
     const [teachers, setTeachers] = React.useState<readonly User[]>();
     const [className, setClassName] = React.useState<string>();
     const [selectedTeacherId, setSelectedTeacherId] = React.useState<string>();
+    const [selectedSectionId, setSelectedSectionId] = React.useState<string>();
 
     React.useEffect(() => {
+        const sectionsQuery = `
+        query {
+            sections {
+                id
+                name
+            }
+        }
+        `;
+
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                query: sectionsQuery,
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.errors) {
+                    message.error(res.errors[0].message, 7);
+                } else {
+                    setSections(res.data.sections);
+                }
+            })
+            .catch(err => console.log(err));
+
         const query = `
         query {
             users(filter: {role: {type: "teacher"}}) {
@@ -33,23 +65,37 @@ const AddClassModal = (props: Properties) => {
         }
         `;
 
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query
+        if (user?.role.type == 'admin' || user?.role.type == 'schoolAdmin') {
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query
+                })
             })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setTeachers(_.sortBy(res.data.users, 'lastName'));
-            })
-            .catch(err => console.log(err));
-    }, []);
+                .then(res => res.json())
+                .then(res => {
+                    if (res.errors) {
+                        message.error(res.errors[0].message, 7);
+                    } else {
+                        setTeachers(_.sortBy(res.data.users, 'lastName'));
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // set default section
+        if (props.sectionId) {
+            setSelectedSectionId(props.sectionId);
+        }
+
+        // set default teacher
+        setSelectedTeacherId(getDefaultTeacherValue());
+    }, [props.sectionId]);
 
     const layout = {
         labelCol: { span: 4 },
@@ -65,7 +111,7 @@ const AddClassModal = (props: Properties) => {
             id,
             name: className,
             teacherId: selectedTeacherId,
-            sectionId: props.section?.id
+            sectionId: selectedSectionId
         }
 
         const query = `
@@ -97,6 +143,14 @@ const AddClassModal = (props: Properties) => {
             .catch(err => console.log(err));
     }
 
+    const getDefaultTeacherValue = () => {
+        if (user && user.role && user.role.type == 'teacher') {
+            return user.id;
+        } else {
+            return undefined;
+        }
+    }
+
     return (
         <>
             <Modal
@@ -111,30 +165,52 @@ const AddClassModal = (props: Properties) => {
                     {...layout}
                     onFinish={handleSave}
                 >
-                    <b><p>Section: {props.section?.name}</p></b>
-
                     <Form.Item
-                        label="Class name"
-                        name="className"
-                        rules={[{ required: true, message: 'Please input a class name!' }]}
+                        label="Section"
+                        name="section"
+                        rules={[{ required: true, message: 'Please select a section!' }]}
+                        initialValue={selectedSectionId}
                     >
-                        <Input onChange={(e) => setClassName(e.target.value)} />
+                        <Select
+                            value={selectedSectionId}
+                            onChange={(value: string) => setSelectedSectionId(value)}
+                            placeholder='select a section...'
+                        >
+                            {
+                                _.map(sections, section => {
+                                    return <Select.Option value={section.id} key={section.id}>{section.name}</Select.Option>
+                                })
+                            }
+                        </Select>
                     </Form.Item>
 
                     <Form.Item
                         label="Teacher"
                         name="teacher"
                         rules={[{ required: true, message: 'Please select a teacher!' }]}
+                        initialValue={selectedTeacherId}
                     >
                         <Select
+                            value={selectedTeacherId}
                             onChange={(value: string) => setSelectedTeacherId(value)}
+                            placeholder='select a teacher...'
                         >
                             {
-                                _.map(teachers, teacher => {
-                                    return <Select.Option value={teacher.id} key={teacher.id}>{`${teacher.lastName}, ${teacher.firstName} ${teacher.middleInitial}`}</Select.Option>
-                                })
+                                user && user.role && user.role.type == 'teacher' ?
+                                    <Select.Option value={user.id} key={user.id}>{`${user.lastName}, ${user.firstName} ${user.middleInitial}`}</Select.Option> :
+                                    _.map(teachers, teacher => {
+                                        return <Select.Option value={teacher.id} key={teacher.id}>{`${teacher.lastName}, ${teacher.firstName} ${teacher.middleInitial}`}</Select.Option>
+                                    })
                             }
                         </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Class name"
+                        name="className"
+                        rules={[{ required: true, message: 'Please input a class name!' }]}
+                    >
+                        <Input onChange={(e) => setClassName(e.target.value)} placeholder='input a name...' />
                     </Form.Item>
 
                     <Form.Item {...tailLayout}>
