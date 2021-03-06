@@ -112,7 +112,7 @@ const Classes = (props) => {
                         title: 'Teacher',
                         dataIndex: 'teacherId',
                         key: 'teacherId',
-                        render: (teacherId, record) => {
+                        render: (teacherId) => {
                             if (teacherId) {
                                 return `${teacherId.lastName}, ${teacherId.firstName}`;
                             } else {
@@ -124,8 +124,8 @@ const Classes = (props) => {
                             if (!a && b) return -1;
                             if (!a && !b) return 0;
 
-                            const aName = `${a.lastName}, ${a.firstName}`;
-                            const bName = `${b.lastName}, ${b.firstName}`;
+                            const aName = `${a.teacherId.lastName}, ${a.teacherId.firstName}`;
+                            const bName = `${b.teacherId.lastName}, ${b.teacherId.firstName}`;
                             
                             return aName.localeCompare(bName);
                         },
