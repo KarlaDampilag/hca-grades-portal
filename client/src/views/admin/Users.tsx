@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { User } from '../../interfaces';
 
-import DataTable from '../../components/DataTable';
+import DataTable, { getColumnSearchProps, customSorter } from '../../components/DataTable';
 
 interface Properties { }
 
@@ -57,12 +57,33 @@ const Users = (props: Properties) => {
                                 fullName = fullName.concat(` ${user.middleInitial}.`);
                             }
                             return fullName;
-                        }
+                        },
+                        sorter: (a, b) => {
+                            if (a && !b) return 1;
+                            if (!a && b) return -1;
+                            if (!a && !b) return 0;
+
+                            const aName = `${a.lastName}, ${a.firstName}`;
+                            const bName = `${b.lastName}, ${b.firstName}`;
+                            
+                            return aName.localeCompare(bName);
+                        },
+                        ...getColumnSearchProps(
+                            'lastName',
+                            {
+                                customFilter: (valueToSearch, record) => {
+                                    const name = `${record.lastName}, ${record.firstName}`;
+                                    return name.toLowerCase().indexOf(valueToSearch.toLowerCase()) >= 0;
+                                }
+                            }
+                        )
                     },
                     {
                         title: 'Username',
                         dataIndex: 'email',
-                        key: 'email'
+                        key: 'email',
+                        sorter: (a, b) => customSorter(a, b, 'email'),
+                        ...getColumnSearchProps('email')
                     },
                     {
                         title: 'Role',
@@ -70,7 +91,17 @@ const Users = (props: Properties) => {
                         key: 'role',
                         render: (role) => {
                             return role.type;
-                        }
+                        },
+                        sorter: true,
+                        ...getColumnSearchProps(
+                            'lastName',
+                            {
+                                customFilter: (valueToSearch, record) => {
+                                    const name = `${record.role.type}, ${record.role.type}`;
+                                    return name.toLowerCase().indexOf(valueToSearch.toLowerCase()) >= 0;
+                                }
+                            }
+                        )
                     }
                 ]}
                 footer={(pageData) => {
