@@ -19,36 +19,38 @@ const Sections = (props: Properties) => {
     const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('all');
 
     React.useEffect(() => {
-        const query = `
-        query {
-            sections {
-                id
-                name
-                adviserId {
-                    id
-                    firstName
-                    lastName
+        if (user) {
+            const query = `
+                query {
+                    sections {
+                        id
+                        name
+                        adviserId {
+                            id
+                            firstName
+                            lastName
+                        }
+                    }
                 }
-            }
-        }
-        `;
+            `;
 
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query
+                })
             })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setSections(res.data.sections);
-            })
-            .catch(err => console.log(err));
+                .then(res => res.json())
+                .then(res => {
+                    setSections(res.data.sections);
+                })
+                .catch(err => console.log(err));
+        }
     }, []);
 
     let finalSections: Section[] = [];

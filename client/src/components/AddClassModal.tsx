@@ -22,47 +22,49 @@ const AddClassModal = (props: Properties) => {
     const [selectedSectionId, setSelectedSectionId] = React.useState<string>();
 
     React.useEffect(() => {
-        const sectionsQuery = `
-        query {
-            sections {
-                id
-                name
-            }
-        }
-        `;
-
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query: sectionsQuery,
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.errors) {
-                    message.error(res.errors[0].message, 7);
-                } else {
-                    setSections(res.data.sections);
+        if (user) {
+            const sectionsQuery = `
+            query {
+                sections {
+                    id
+                    name
                 }
+            }
+            `;
+
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query: sectionsQuery,
+                })
             })
-            .catch(err => console.log(err));
+                .then(res => res.json())
+                .then(res => {
+                    if (res.errors) {
+                        message.error(res.errors[0].message, 7);
+                    } else {
+                        setSections(res.data.sections);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
 
         const query = `
-        query {
-            users(filter: {role: {type: "teacher"}}) {
-                id
-                firstName
-                lastName
-                middleInitial
-                email
-                role
+            query {
+                users(filter: {role: {type: "teacher"}}) {
+                    id
+                    firstName
+                    lastName
+                    middleInitial
+                    email
+                    role
+                }
             }
-        }
         `;
 
         if (user?.role.type == 'admin' || user?.role.type == 'schoolAdmin') {

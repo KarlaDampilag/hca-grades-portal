@@ -21,41 +21,42 @@ const Classes = (props) => {
     const sectionId = urlQuery.get('sectionId') || undefined;
 
     React.useEffect(() => {
-        const classesQuery = `
-        query {
-            classes {
-                id
-                name
-                teacherId {
-                    id
-                    firstName
-                    lastName
+        if (user) {
+            const classesQuery = `
+                query {
+                    classes {
+                        id
+                        name
+                        teacherId {
+                            id
+                            firstName
+                            lastName
+                        }
+                        sectionId {
+                            id
+                            name
+                        }
+                    }
                 }
-                sectionId {
-                    id
-                    name
-                }
-            }
+            `;
+
+            fetch('http://localhost:4000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query: classesQuery
+                })
+            })
+                .then(res => res.json())
+                .then(res => {
+                    setClasses(res.data.classes);
+                })
+                .catch(err => console.log(err));
         }
-        `;
-
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query: classesQuery
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setClasses(res.data.classes);
-            })
-            .catch(err => console.log(err));
-
     }, []);
 
     let finalClasses: MyClass[] = [];
@@ -103,7 +104,7 @@ const Classes = (props) => {
 
                             const aName = a.name;
                             const bName = b.name;
-                            
+
                             return aName.localeCompare(bName);
                         },
                         ...getColumnSearchProps('sectionId', { referencedPropertyName: 'name' })
@@ -126,7 +127,7 @@ const Classes = (props) => {
 
                             const aName = `${a.teacherId.lastName}, ${a.teacherId.firstName}`;
                             const bName = `${b.teacherId.lastName}, ${b.teacherId.firstName}`;
-                            
+
                             return aName.localeCompare(bName);
                         },
                         ...getColumnSearchProps(
