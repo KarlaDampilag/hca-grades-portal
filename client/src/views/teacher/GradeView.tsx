@@ -7,9 +7,14 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import { MyClass, Grade, } from '../../interfaces';
 import DataTable from '../../components/DataTable';
-import { getQuarterNumber } from '../../utils/utils'; 
+import { getQuarterNumber } from '../../utils/utils';
+
+import { MyContext } from '../../App';
 
 const GradeView = (props) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [quarterNumber, setQuarterNumber] = React.useState<string>('');
     const [grades, setGrades] = React.useState<readonly Grade[]>();
@@ -25,6 +30,7 @@ const GradeView = (props) => {
                 id
                 name
                 teacherId {
+                    id
                     firstName
                     lastName
                 }
@@ -95,6 +101,15 @@ const GradeView = (props) => {
         setQuarterNumber(getQuarterNumber(quarter));
     }, []);
 
+    const userCanUploadGrade = () => {
+        let ret = false;
+        if (user?.role.type == 'admin' || user?.role.type == 'schoolAdmin') {
+            ret = true;
+        } else if (myClass?.teacherId.id == user?.id) {
+            ret = true;
+        }
+        return ret;
+    }
 
     return (
         <>
@@ -155,15 +170,17 @@ const GradeView = (props) => {
                         dataIndex: ['scores', 'finalGrade'],
                         key: 'Final Grade'
                     }
-                ]} // TODO you stopped here, display the columns for grades
+                ]}
                 footer={(pageData) => {
                     return (
-                        <Link
-                            to={`/addGrade?classId=${myClass?.id}&quarter=${quarter}`}
-                            style={{ display: 'block' }}
-                        >
-                            <Button type='primary'>Upload Grades</Button>
-                        </Link>
+                        <Button type='primary' disabled={!userCanUploadGrade()}>
+                            <Link
+                                to={`/addGrade?classId=${myClass?.id}&quarter=${quarter}`}
+                                style={{ display: 'block' }}
+                            >
+                                Upload Grades
+                            </Link>
+                        </Button>
                     )
                 }}
             />
