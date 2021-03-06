@@ -3,7 +3,8 @@ import './App.css';
 
 import {
   Switch,
-  Route
+  Route,
+  useHistory 
 } from "react-router-dom";
 
 import { Card } from 'antd';
@@ -25,6 +26,8 @@ import Header from './components/Header';
 import { User, Section } from './interfaces';
 
 function App() {
+  const history = useHistory();
+
   const [user, setUser] = React.useState<User>();
   const [sections, setSections] = React.useState<readonly Section[]>();
 
@@ -117,7 +120,7 @@ function App() {
                   <Route path='/teachers' component={Teachers} />
                   <Route path='/addTeacher' component={AddTeacher} />
                 </> : <>
-                  <p>Please log in to use this application.</p>
+                  {history.push('/login')}
                 </>
               }
             </Switch>
