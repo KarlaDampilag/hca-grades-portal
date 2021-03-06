@@ -98,8 +98,8 @@ function App() {
       user: user,
       sections: sections
     }}>
-      {user && history.push('/login')}
-      
+      {!user && history.push('/login')}
+
       <div className="App">
         <header className="App-header">
           <Header />
