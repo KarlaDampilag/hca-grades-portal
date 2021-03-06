@@ -26,9 +26,8 @@ const Header = () => {
                             {
                                 user.role.type == 'admin' &&
                                 <>
-                                    <Menu.Item key='classes'><Link to='/classes'>Classes</Link></Menu.Item>
-                                    <Menu.Item key='grades'><Link to='/grades'>Grades</Link></Menu.Item>
                                     <Menu.Item key='sections'><Link to='/sections'>Sections</Link></Menu.Item>
+                                    <Menu.Item key='classes'><Link to='/classes'>Classes</Link></Menu.Item>
                                     <Menu.Item key='teachers'><Link to='/teachers'>Teachers</Link></Menu.Item>
                                     <Menu.Item key='users'><Link to='/users'>Users</Link></Menu.Item>
                                 </>
@@ -43,7 +42,7 @@ const Header = () => {
                             {
                                 user.role.type == 'teacher' &&
                                 <>
-                                    <Menu.Item key='sections'><Link to='/sections'>Sections</Link></Menu.Item>
+                                    <Menu.Item key='classes'><Link to='/classes'>Classes</Link></Menu.Item>
                                 </>
                             }
                             {

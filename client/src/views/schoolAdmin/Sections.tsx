@@ -16,7 +16,7 @@ const Sections = (props: Properties) => {
     const { user } = context;
 
     const [sections, setSections] = React.useState<readonly Section[]>([]);
-    const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('mine');
+    const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('all');
 
     React.useEffect(() => {
         const query = `
@@ -63,10 +63,10 @@ const Sections = (props: Properties) => {
 
     return (
         <>
-            <Radio.Group onChange={(e) => setSectionFilter(e.target.value)} value={sectionFilter}>
+            {/* <Radio.Group onChange={(e) => setSectionFilter(e.target.value)} value={sectionFilter}>
                 <Radio value='all'>All</Radio>
                 <Radio value='mine'>My Section</Radio>
-            </Radio.Group>
+            </Radio.Group> */}
             <DataTable
                 data={finalSections}
                 columns={[
