@@ -80,7 +80,7 @@ type Mutation {
   addSection(id: String!, name: String, adviserId: String!, students: [UserInput!]!): Section
   addClass(id: String!, name: String, teacherId: String!, sectionId: String!): Class
   addGrade(id: String!, studentId: String!, classId: String!, scores: Object!, quarter: Int!): Grade
-  addGrades(grades: [GradeInput!]!): [Grade]
+  addGrades(grades: [GradeInput!]!, quarter: Int!): [Grade]
   login(email: String!, password: String!): User
   logout: Null
 }
@@ -444,11 +444,11 @@ const resolvers = {
       return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
     },
 
-    addGrades: async (root, { grades }, context) => {
+    addGrades: async (root, { grades, quarter }, context) => {
       const callback = async () => {
         const classId = grades[0].classId;
         const myClass = await Class.findOne({ id: classId });
-        await Grade.deleteMany({ classId: myClass._id });
+        await Grade.deleteMany({ classId: myClass._id, quarter });
 
         const newGrades = [];
         for (const grade of grades) {

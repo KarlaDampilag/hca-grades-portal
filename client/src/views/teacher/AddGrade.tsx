@@ -11,12 +11,7 @@ import { User, Grade, MyClass } from '../../interfaces';
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
-import { MyContext } from './../../App';
-
 const AddGrade = (props) => {
-    const context = React.useContext(MyContext);
-    const { user } = context;
-
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [quarterNumber, setQuarterNumber] = React.useState<string>('');
     const [grades, setGrades] = React.useState<readonly Grade[]>([]);
@@ -189,8 +184,8 @@ const AddGrade = (props) => {
     const handleSaveSection = async (grades: readonly Grade[]) => {
         const addGrade = async () => {
             const query = `
-                mutation($grades: [GradeInput!]!) {
-                    addGrades(grades: $grades) {
+                mutation($grades: [GradeInput!]!, $quarter: Int!) {
+                    addGrades(grades: $grades, quarter: $quarter) {
                         id
                     }
                 }
@@ -205,7 +200,10 @@ const AddGrade = (props) => {
                 credentials: 'include',
                 body: JSON.stringify({
                     query,
-                    variables: { grades }
+                    variables: {
+                        grades,
+                        quarter: parseInt(quarter as string)
+                    }
                 })
             })
                 .then(res => res.json())
@@ -238,7 +236,7 @@ const AddGrade = (props) => {
         <>
             <Link to={`/grade?classId=${classId}&quarter=${quarter}`}><Button icon={<ArrowLeftOutlined />}>Return To Grade</Button></Link>
             <h1>{`${quarterNumber} Quarter - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
-            <p style={{ color: '#f54c4c' }}>Confirming your upload will overwrite any currently saved grades in the database.</p>
+            <p style={{ color: '#f54c4c' }}>Confirming your upload will overwrite any currently saved grades in the database for this quarter.</p>
             <Form
                 onFinish={() => setConfirmationModalIsVisible(true)}
             >
