@@ -4,7 +4,7 @@ import './App.css';
 import {
   Switch,
   Route,
-  useHistory 
+  useHistory
 } from "react-router-dom";
 
 import { Card } from 'antd';
@@ -62,7 +62,7 @@ function App() {
       })
       .catch(err => console.log(err));
 
-      const sectionQuery = `
+    const sectionQuery = `
         query {
             sections {
                 id
@@ -75,22 +75,22 @@ function App() {
         }
         `;
 
-        fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                query: sectionQuery
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                setSections(res.data.sections);
-            })
-            .catch(err => console.log(err));
+    fetch('http://localhost:4000/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        query: sectionQuery
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        setSections(res.data.sections);
+      })
+      .catch(err => console.log(err));
   }, []);
 
   return (
@@ -98,6 +98,8 @@ function App() {
       user: user,
       sections: sections
     }}>
+      {user && history.push('/login')}
+      
       <div className="App">
         <header className="App-header">
           <Header />
@@ -106,23 +108,18 @@ function App() {
           <Card>
             <Switch>
               <Route path='/login' component={() => <Login />} />
-              {user ?
-                <>
-                  <Route path='/sections' component={Sections} />
-                  <Route path='/section' component={SectionView} />
-                  <Route path='/addSection' component={AddSection} />
-                  <Route path='/classes' component={Classes} />
-                  <Route path='/grade' component={GradeView} />
-                  <Route path='/addGrade' component={AddGrade} />
-                  <Route path='/finalGrades' component={FinalGrades} />
-                  <Route path='/users' component={Users} />
-                  <Route path='/addUser' component={AddUser} />
-                  <Route path='/teachers' component={Teachers} />
-                  <Route path='/addTeacher' component={AddTeacher} />
-                </> : <>
-                  {history.push('/login')}
-                </>
-              }
+              <Route path='/sections' component={Sections} />
+              <Route path='/section' component={SectionView} />
+              <Route path='/addSection' component={AddSection} />
+              <Route path='/classes' component={Classes} />
+              <Route path='/grade' component={GradeView} />
+              <Route path='/addGrade' component={AddGrade} />
+              <Route path='/finalGrades' component={FinalGrades} />
+              <Route path='/users' component={Users} />
+              <Route path='/addUser' component={AddUser} />
+              <Route path='/teachers' component={Teachers} />
+              <Route path='/addTeacher' component={AddTeacher} />
+              <Route exact path='/' component={Classes} />
             </Switch>
           </Card>
         </div>
