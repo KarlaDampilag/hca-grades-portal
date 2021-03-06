@@ -67,6 +67,7 @@ const Sections = (props: Properties) => {
                 <Radio value='all'>All</Radio>
                 <Radio value='mine'>My Section</Radio>
             </Radio.Group> */}
+            <h1>Sections</h1>
             <DataTable
                 data={finalSections}
                 columns={[

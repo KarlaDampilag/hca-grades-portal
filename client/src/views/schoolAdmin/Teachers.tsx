@@ -43,10 +43,9 @@ const Teachers = (props: Properties) => {
             .catch(err => console.log(err));
     }, []);
 
-    console.log(teachers)
-
     return (
         <>
+            <h1>Teachers</h1>
             <DataTable
                 data={teachers}
                 columns={[

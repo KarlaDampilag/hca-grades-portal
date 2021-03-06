@@ -44,6 +44,7 @@ const Users = (props: Properties) => {
 
     return (
         <>
+            <h1>Users</h1>
             <DataTable
                 data={users}
                 columns={[
@@ -65,7 +66,7 @@ const Users = (props: Properties) => {
 
                             const aName = `${a.lastName}, ${a.firstName}`;
                             const bName = `${b.lastName}, ${b.firstName}`;
-                            
+
                             return aName.localeCompare(bName);
                         },
                         ...getColumnSearchProps(
