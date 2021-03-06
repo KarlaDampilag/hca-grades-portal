@@ -69,6 +69,7 @@ type Query {
   studentsByClassId(id: String!): [User]
   sections: [Section]
   section(id: String!): Section
+  classes: [Class]
   classesBySectionId(sectionId: String!): [Class]
   class(id: String!): Class
   gradesByClassId(classId: String!, quarter: Int!): [Grade]
@@ -262,6 +263,33 @@ const resolvers = {
             return section;
           } else {
             throw new Error('Section not found');
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    classes: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const myClasses = await Class.find({}).exec();
+          if (myClasses) {
+            for (const myClass of myClasses) {
+              const teacher = await User.findById(myClass.teacherId).exec();
+              const section = await Section.findById(myClass.sectionId).exec();
+              if (teacher) {
+                myClass.teacherId = teacher;
+              } else {
+                throw new Error('Teacher not found');
+              }
+              if (section) {
+                myClass.sectionId = section;
+              } else {
+                throw new Error('Section not found');
+              }
+            }
+            return myClasses;
           }
         } catch (err) {
           throw new Error(err);
