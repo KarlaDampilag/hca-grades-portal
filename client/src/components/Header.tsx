@@ -56,8 +56,8 @@ const Header = () => {
                             <span id='welcome'>{`Welcome, ${user.firstName} ${user.lastName}!`}</span>
                         </> :
                         <>
-                            <Link to="/signup">Sign Up</Link>
-                            <Link to="/login">Log In</Link>
+                            {/* <Menu.Item key='signup'><Link to="/signup">Sign Up</Link></Menu.Item> */}
+                            <Menu.Item key='login'><Link to="/login">Log In</Link></Menu.Item>
                         </>
                 }
             </Menu>
