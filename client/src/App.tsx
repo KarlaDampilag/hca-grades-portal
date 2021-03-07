@@ -7,7 +7,7 @@ import {
   useHistory
 } from "react-router-dom";
 
-import { Card } from 'antd';
+import { Card, Spin } from 'antd';
 
 import Users from './views/admin/Users';
 import AddUser from './views/admin/AddUser';
@@ -29,6 +29,7 @@ function App() {
   const history = useHistory();
 
   const [user, setUser] = React.useState<User>();
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     const query = `
@@ -58,9 +59,21 @@ function App() {
       .then(res => res.json())
       .then(res => {
         setUser(res.data.me);
+        setIsLoading(false);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        setIsLoading(false);
+      });
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className='spin-container'>
+        <Spin size='large' tip="Loading..."></Spin>
+      </div>
+    );
+  }
 
   return (
     <MyContext.Provider value={{
