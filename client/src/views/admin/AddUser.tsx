@@ -17,8 +17,8 @@ const AddUser = (props: Properties) => {
 
     const [form] = Form.useForm();
     const layout = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 },
+        labelCol: { span: 4 },
+        wrapperCol: { span: 20 },
     };
     const tailLayout = {
         wrapperCol: { offset: 8, span: 16 },

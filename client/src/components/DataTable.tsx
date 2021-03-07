@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 interface Properties {
     data: any,
     columns: ColumnsType<any>,
+    loading?: boolean,
     pagination?: object,
     footer?: (currentPageData) => JSX.Element
     onRow?: (record, rowIndex) => {}
@@ -82,6 +83,7 @@ const DataTable = (props: Properties) => {
                 pagination={props.pagination}
                 footer={props.footer}
                 onRow={props.onRow}
+                loading={props.loading}
             />
         </div>
     )

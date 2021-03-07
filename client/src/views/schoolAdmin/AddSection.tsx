@@ -43,6 +43,7 @@ const AddSection = () => {
     const [selectedTeacherId, setSelectedTeacherId] = React.useState<string>('');
     const [students, setStudents] = React.useState<readonly student[]>([]);
     const [confirmationModalIsVisible, setConfirmationModalIsVisible] = React.useState<boolean>(false);
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         const query = `
@@ -147,6 +148,7 @@ const AddSection = () => {
                 } else {
                     message.error('Some student fields are not filled in. Please complete the Excel sheet before uploading!', 6);
                 }
+                setIsLoading(false);
             }
         };
         reader.readAsBinaryString(file);
@@ -248,11 +250,20 @@ const AddSection = () => {
                     getValueFromEvent={normFile}
                     rules={[{ required: true, message: 'Please upload a section file!' }]}
                 >
-                    <input type='file' id='sectionFileUpload' name='sectionFileUpload' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' onChange={handleFileUploadChange} />
+                    <input
+                    type='file'
+                    id='sectionFileUpload'
+                    name='sectionFileUpload'
+                    accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    onChange={(e) => {
+                        setIsLoading(true);
+                        handleFileUploadChange(e);
+                    }} />
                 </Form.Item>
 
                 <h2>Students Preview:</h2>
                 <DataTable
+                    loading={isLoading}
                     data={students}
                     columns={[
                         {

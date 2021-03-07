@@ -18,12 +18,14 @@ const GradeView = (props) => {
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [quarterNumber, setQuarterNumber] = React.useState<string>('');
     const [grades, setGrades] = React.useState<readonly Grade[]>();
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     const urlQuery = new URLSearchParams(props.location.search);
     const id = urlQuery.get('classId');
     const quarter = urlQuery.get('quarter');
 
     React.useEffect(() => {
+        setIsLoading(true);
         const classQuery = `
         query($id: String!) {
             class(id: $id) {
@@ -95,8 +97,12 @@ const GradeView = (props) => {
             .then(res => res.json())
             .then(res => {
                 setGrades(res.data.gradesByClassId);
+                setIsLoading(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                setIsLoading(false);
+            });
 
         setQuarterNumber(getQuarterNumber(quarter));
     }, []);
@@ -116,6 +122,7 @@ const GradeView = (props) => {
             <Link to={`/classes?sectionId=${myClass?.sectionId?.id}`}><Button icon={<ArrowLeftOutlined />}>Return To Classes</Button></Link>
             <h1>{`${quarterNumber} Quarter - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
             <DataTable
+                loading={isLoading}
                 data={grades}
                 columns={[
                     {

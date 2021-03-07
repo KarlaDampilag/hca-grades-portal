@@ -16,11 +16,13 @@ const Classes = (props) => {
 
     const [classes, setClasses] = React.useState<readonly MyClass[]>([]);
     const [filter, setFilter] = React.useState<'mine' | 'all'>('mine');
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     const urlQuery = new URLSearchParams(props.location.search);
     const sectionId = urlQuery.get('sectionId') || undefined;
 
     React.useEffect(() => {
+        setIsLoading(true);
         if (user) {
             const classesQuery = `
                 query {
@@ -54,8 +56,12 @@ const Classes = (props) => {
                 .then(res => res.json())
                 .then(res => {
                     setClasses(res.data.classes);
+                    setIsLoading(false);
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    console.log(err);
+                    setIsLoading(false);
+                });
         }
     }, []);
 
@@ -72,11 +78,14 @@ const Classes = (props) => {
     return (
         <>
             <h1>Classes</h1>
+
             <Radio.Group onChange={(e) => setFilter(e.target.value)} value={filter}>
                 <Radio value='all'>All</Radio>
                 <Radio value='mine'>My Classes</Radio>
             </Radio.Group>
+
             <DataTable
+                loading={isLoading}
                 data={finalClasses}
                 columns={[
                     {

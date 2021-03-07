@@ -17,6 +17,7 @@ const AddGrade = (props) => {
     const [grades, setGrades] = React.useState<readonly Grade[]>([]);
     const [confirmationModalIsVisible, setConfirmationModalIsVisible] = React.useState<boolean>(false);
     const [students, setStudents] = React.useState<readonly User[]>();
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     const urlQuery = new URLSearchParams(props.location.search);
     const classId = urlQuery.get('classId');
@@ -176,6 +177,7 @@ const AddGrade = (props) => {
                 } else {
                     message.error('Some student fields are not filled in. Please complete the Excel sheet before uploading!', 6);
                 }
+                setIsLoading(false);
             }
         };
         reader.readAsBinaryString(file);
@@ -247,11 +249,20 @@ const AddGrade = (props) => {
                     getValueFromEvent={normFile}
                     rules={[{ required: true, message: 'Please upload a grades file!' }]}
                 >
-                    <input type='file' id='sectionFileUpload' name='sectionFileUpload' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' onChange={handleFileUploadChange} />
+                    <input
+                    type='file'
+                    id='sectionFileUpload'
+                    name='sectionFileUpload'
+                    accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    onChange={(e) => {
+                        setIsLoading(true);
+                        handleFileUploadChange(e);
+                    }} />
                 </Form.Item>
 
                 <h2>Grade Preview:</h2>
                 <DataTable
+                    loading={isLoading}
                     data={grades}
                     columns={[
                         {
