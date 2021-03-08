@@ -67,12 +67,12 @@ table {
 }
 
 #welcome {
-  position: 'absolute';
+  position: absolute;
   right: 0;
-  padding-right: '20px';
+  padding-right: 20px;
 }
 
-@media only screen and (min-width: 400px) {
+@media only screen and (max-width: 450px) {
   #welcome {
     display: none;
   }
