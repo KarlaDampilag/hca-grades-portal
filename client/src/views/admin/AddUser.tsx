@@ -3,10 +3,19 @@ import { Link } from 'react-router-dom'
 import { Button, Form, Input, Radio, message } from 'antd';
 import { Role } from '../../interfaces';
 import { generateId } from '../../utils/utils';
+import { MyContext } from './../../App';
+
+import NoViewPermission from '../../components/NoViewPermission';
+
+const viewAllowedRoles = ['admin'];
 
 interface Properties { }
 
 const AddUser = (props: Properties) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [firstName, setFirstName] = React.useState<string>();
     const [lastName, setLastName] = React.useState<string>();
     const [middleInitial, setMiddleInitial] = React.useState<string>();
@@ -113,6 +122,10 @@ const AddUser = (props: Properties) => {
                 form.resetFields();
             })
             .catch(err => console.log(err));
+    }
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
     }
 
     return (

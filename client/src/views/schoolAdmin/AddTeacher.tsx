@@ -1,15 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
-import { Input, Form, Button, message, Select } from 'antd';
+import { Form, Button, message, } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import * as _ from 'lodash';
 
 import { generateId, generateUsername, generatePassword } from '../../utils/utils';
-import { User } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import NoViewPermission from '../../components/NoViewPermission';
+
+import { MyContext } from './../../App';
 
 interface teacherParams {
     firstName: string,
@@ -27,7 +29,13 @@ interface teacher extends teacherParams {
     id: string
 }
 
+const viewAllowedRoles = ['admin', 'schoolAdmin'];
+
 const AddTeacher = () => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [teachers, setTeachers] = React.useState<readonly teacher[]>([]);
     const [confirmationModalIsVisible, setConfirmationModalIsVisible] = React.useState<boolean>(false);
 
@@ -163,6 +171,10 @@ const AddTeacher = () => {
         labelCol: { span: 3 },
         wrapperCol: { span: 21 },
     };
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

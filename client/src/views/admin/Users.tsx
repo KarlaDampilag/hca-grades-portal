@@ -5,10 +5,19 @@ import { Link } from 'react-router-dom';
 import { User } from '../../interfaces';
 
 import DataTable, { getColumnSearchProps, customSorter } from '../../components/DataTable';
+import NoViewPermission from '../../components/NoViewPermission';
+import { MyContext } from './../../App';
+
+
+const viewAllowedRoles = ['admin'];
 
 interface Properties { }
 
 const Users = (props: Properties) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [users, setUsers] = React.useState<readonly User[]>();
 
     React.useEffect(() => {
@@ -41,6 +50,10 @@ const Users = (props: Properties) => {
             })
             .catch(err => console.log(err));
     }, []);
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

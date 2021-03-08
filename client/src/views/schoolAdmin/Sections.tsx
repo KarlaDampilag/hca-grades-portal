@@ -6,14 +6,18 @@ import { Button, Radio } from 'antd';
 import { Section } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
+import NoViewPermission from '../../components/NoViewPermission';
 
 import { MyContext } from '../../App';
 
 interface Properties { }
 
+const viewAllowedRoles = ['admin', 'schoolAdmin'];
+
 const Sections = (props: Properties) => {
     const context = React.useContext(MyContext);
     const { user } = context;
+    const currentUserRole = user?.role.type;
 
     const [sections, setSections] = React.useState<readonly Section[]>([]);
     const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('all');
@@ -59,8 +63,12 @@ const Sections = (props: Properties) => {
             return section.adviserId.id == user?.id;
         });
         finalSections = [...filteredSections];
-    } else if (sectionFilter == 'all') {
+    } else if (sectionFilter == 'all' && sections) {
         finalSections = [...sections];
+    }
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
     }
 
     return (

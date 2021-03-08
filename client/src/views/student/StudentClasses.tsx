@@ -1,24 +1,23 @@
 import React from 'react';
 import * as _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Button, Radio } from 'antd';
+import { Button } from 'antd';
 
 
 import { MyClass } from '../../interfaces';
 import DataTable, { getColumnSearchProps, customSorter } from '../../components/DataTable';
-import AddClassModal from '../../components/AddClassModal';
 import NoViewPermission from '../../components/NoViewPermission';
+
 import { MyContext } from '../../App';
 
-const viewAllowedRoles = ['admin', 'schoolAdmin', 'teacher'];
+const viewAllowedRoles = ['admin', 'student'];
 
-const Classes = (props) => {
+const StudentClasses = (props) => {
     const context = React.useContext(MyContext);
     const { user } = context;
     const currentUserRole = user?.role.type;
 
     const [classes, setClasses] = React.useState<readonly MyClass[]>([]);
-    const [filter, setFilter] = React.useState<'mine' | 'all'>('mine');
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     const urlQuery = new URLSearchParams(props.location.search);
@@ -28,18 +27,14 @@ const Classes = (props) => {
         setIsLoading(true);
         if (user) {
             const classesQuery = `
-                query {
-                    classes {
+                query($sectionId: String!) {
+                    classesBySectionId(sectionId: $sectionId) {
                         id
                         name
                         teacherId {
                             id
                             firstName
                             lastName
-                        }
-                        sectionId {
-                            id
-                            name
                         }
                     }
                 }
@@ -53,12 +48,15 @@ const Classes = (props) => {
                 },
                 credentials: 'include',
                 body: JSON.stringify({
-                    query: classesQuery
+                    query: classesQuery,
+                    variables: {
+                        sectionId
+                    }
                 })
             })
                 .then(res => res.json())
                 .then(res => {
-                    setClasses(res.data.classes);
+                    setClasses(res.data.classesBySectionId);
                     setIsLoading(false);
                 })
                 .catch(err => {
@@ -68,16 +66,6 @@ const Classes = (props) => {
         }
     }, []);
 
-    let finalClasses: MyClass[] = [];
-    if (filter == 'mine') {
-        const filtered = _.filter(classes, myClass => {
-            return myClass.teacherId.id == user?.id;
-        });
-        finalClasses = [...filtered];
-    } else if (filter == 'all') {
-        finalClasses = [...classes];
-    }
-
     if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
         return <NoViewPermission />
     }
@@ -86,14 +74,9 @@ const Classes = (props) => {
         <>
             <h1>Classes</h1>
 
-            <Radio.Group onChange={(e) => setFilter(e.target.value)} value={filter}>
-                <Radio value='all'>All</Radio>
-                <Radio value='mine'>My Classes</Radio>
-            </Radio.Group>
-
             <DataTable
                 loading={isLoading}
-                data={finalClasses}
+                data={classes}
                 columns={[
                     {
                         title: 'Name',
@@ -197,14 +180,9 @@ const Classes = (props) => {
                         }
                     },
                 ]}
-                footer={(pageData) => {
-                    return (
-                        <AddClassModal sectionId={sectionId} />
-                    )
-                }}
             />
         </>
     );
 }
 
-export default Classes;
+export default StudentClasses;

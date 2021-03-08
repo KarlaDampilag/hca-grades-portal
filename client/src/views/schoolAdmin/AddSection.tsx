@@ -10,6 +10,7 @@ import { User } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import NoViewPermission from '../../components/NoViewPermission';
 
 import { MyContext } from './../../App';
 
@@ -34,9 +35,12 @@ interface student extends studentParams {
     id: string
 }
 
+const viewAllowedRoles = ['admin', 'schoolAdmin'];
+
 const AddSection = () => {
     const context = React.useContext(MyContext);
     const { user } = context;
+    const currentUserRole = user?.role.type;
 
     const [teachers, setTeachers] = React.useState<readonly User[]>();
     const [sectionName, setSectionName] = React.useState<string>('');
@@ -210,6 +214,10 @@ const AddSection = () => {
         labelCol: { span: 3 },
         wrapperCol: { span: 21 },
     };
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

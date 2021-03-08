@@ -325,7 +325,7 @@ const resolvers = {
           throw new Error(err);
         }
       };
-      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+      return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher', 'student'], callback);
     },
     class: async (root, args, context) => {
       const callback = async () => {

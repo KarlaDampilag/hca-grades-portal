@@ -48,7 +48,7 @@ const Header = () => {
                             {
                                 user.role.type == 'student' &&
                                 <>
-                                    <Menu.Item key='classes'><Link to='/classes'>Classes</Link></Menu.Item>
+                                    <Menu.Item key='studentClasses'><Link to='/studentClasses'>Classes</Link></Menu.Item>
                                     <Menu.Item key='grade'><Link to='/grade'>Grade</Link></Menu.Item>
                                 </>
                             }

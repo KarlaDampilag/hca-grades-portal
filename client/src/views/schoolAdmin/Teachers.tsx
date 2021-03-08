@@ -5,10 +5,18 @@ import { Link } from 'react-router-dom';
 import { User, Role } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
+import NoViewPermission from '../../components/NoViewPermission';
+import { MyContext } from '../../App';
 
 interface Properties { }
 
+const viewAllowedRoles = ['admin', 'schoolAdmin'];
+
 const Teachers = (props: Properties) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [teachers, setTeachers] = React.useState<readonly User[]>();
 
     React.useEffect(() => {
@@ -42,6 +50,10 @@ const Teachers = (props: Properties) => {
             })
             .catch(err => console.log(err));
     }, []);
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

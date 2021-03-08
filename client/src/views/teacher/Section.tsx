@@ -5,8 +5,16 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import DataTable from '../../components/DataTable';
 import { Section, User } from '../../interfaces';
+import NoViewPermission from '../../components/NoViewPermission';
+import { MyContext } from '../../App';
+
+const viewAllowedRoles = ['admin', 'schoolAdmin', 'teacher'];
 
 const SectionView = (props) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [section, setSection] = React.useState<Section>();
     const [students, setStudents] = React.useState<readonly User[]>();
 
@@ -76,6 +84,9 @@ const SectionView = (props) => {
 
     }, []);
 
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

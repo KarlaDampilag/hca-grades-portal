@@ -22,6 +22,7 @@ import AddGrade from './views/teacher/AddGrade';
 import FinalGrades from './views/teacher/FinalGrades';
 import Classes from './views/teacher/Classes';
 import Header from './components/Header';
+import StudentClasses from './views/student/StudentClasses';
 
 import { User } from './interfaces';
 
@@ -100,7 +101,8 @@ function App() {
               <Route path='/addUser' component={AddUser} />
               <Route path='/teachers' component={Teachers} />
               <Route path='/addTeacher' component={AddTeacher} />
-              <Route exact path='/' component={Classes} />
+              <Route path='/studentClasses' component={StudentClasses} />
+              {user && user.role.type == 'student' ? <Route exact path='/' component={StudentClasses} /> : <Route exact path='/' component={Classes} />}
             </Switch>
           </Card>
         </div>

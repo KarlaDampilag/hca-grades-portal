@@ -4,16 +4,18 @@ import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
-
 import { MyClass, Grade, } from '../../interfaces';
 import DataTable from '../../components/DataTable';
 import { getQuarterNumber } from '../../utils/utils';
-
+import NoViewPermission from '../../components/NoViewPermission';
 import { MyContext } from '../../App';
+
+const viewAllowedRoles = ['admin', 'schoolAdmin', 'teacher'];
 
 const GradeView = (props) => {
     const context = React.useContext(MyContext);
     const { user } = context;
+    const currentUserRole = user?.role.type;
 
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [quarterNumber, setQuarterNumber] = React.useState<string>('');
@@ -115,6 +117,10 @@ const GradeView = (props) => {
             ret = true;
         }
         return ret;
+    }
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
     }
 
     return (

@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
-
 import { MyClass, Grade, User } from '../../interfaces';
 import DataTable from '../../components/DataTable';
+import NoViewPermission from '../../components/NoViewPermission';
+import { MyContext } from '../../App';
 
+const viewAllowedRoles = ['admin', 'schoolAdmin', 'teacher'];
 interface FinalGrade {
     student: User,
     1: number,
@@ -45,6 +47,10 @@ const getFinalGrade = (grade: FinalGrade): number =>  {
 }
 
 const FinalGrades = (props) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [grades, setGrades] = React.useState<readonly FinalGrade[]>();
 
@@ -128,6 +134,10 @@ const FinalGrades = (props) => {
             .catch(err => console.log(err));
 
     }, []);
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
+    }
 
     return (
         <>

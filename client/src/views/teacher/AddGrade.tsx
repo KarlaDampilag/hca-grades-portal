@@ -10,8 +10,16 @@ import { User, Grade, MyClass } from '../../interfaces';
 
 import DataTable from '../../components/DataTable';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import NoViewPermission from '../../components/NoViewPermission';
+import { MyContext } from '../../App';
+
+const viewAllowedRoles = ['admin', 'schoolAdmin', 'teacher'];
 
 const AddGrade = (props) => {
+    const context = React.useContext(MyContext);
+    const { user } = context;
+    const currentUserRole = user?.role.type;
+
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [quarterNumber, setQuarterNumber] = React.useState<string>('');
     const [grades, setGrades] = React.useState<readonly Grade[]>([]);
@@ -232,6 +240,10 @@ const AddGrade = (props) => {
         // XLSX.utils.book_append_sheet(wb, ws, "Students");
         // /* write workbook */
         // XLSX.writeFile(wb, `Grades-generated.xlsx`);
+    }
+
+    if (!(currentUserRole && viewAllowedRoles.includes(currentUserRole))) {
+        return <NoViewPermission />
     }
 
     return (
