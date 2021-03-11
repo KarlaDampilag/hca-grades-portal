@@ -20,12 +20,10 @@ const StudentClasses = (props) => {
     const [classes, setClasses] = React.useState<readonly MyClass[]>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-    const urlQuery = new URLSearchParams(props.location.search);
-    const sectionId = urlQuery.get('sectionId') || undefined;
-
     React.useEffect(() => {
         setIsLoading(true);
         if (user) {
+            const sectionId = user.role.sectionId;
             const classesQuery = `
                 query($sectionId: String!) {
                     classesBySectionId(sectionId: $sectionId) {
@@ -86,29 +84,6 @@ const StudentClasses = (props) => {
                         ...getColumnSearchProps('name')
                     },
                     {
-                        title: 'Section',
-                        dataIndex: 'sectionId',
-                        key: 'section',
-                        render: (sectionId) => {
-                            if (sectionId) {
-                                return sectionId.name;
-                            } else {
-                                return null;
-                            }
-                        },
-                        sorter: (a, b) => {
-                            if (a && !b) return 1;
-                            if (!a && b) return -1;
-                            if (!a && !b) return 0;
-
-                            const aName = a.name;
-                            const bName = b.name;
-
-                            return aName.localeCompare(bName);
-                        },
-                        ...getColumnSearchProps('sectionId', { referencedPropertyName: 'name' })
-                    },
-                    {
                         title: 'Teacher',
                         dataIndex: 'teacherId',
                         key: 'teacherId',
@@ -144,41 +119,9 @@ const StudentClasses = (props) => {
                         dataIndex: 'id',
                         key: '1st-quarter',
                         render: (id) => {
-                            return <Link to={`/grade?classId=${id}&quarter=1`}><Button>1st Quarter</Button></Link>;
+                            return <Link to={`/studentGrade?classId=${id}`}><Button>View</Button></Link>;
                         }
-                    },
-                    {
-                        title: '',
-                        dataIndex: 'id',
-                        key: '2nd-quarter',
-                        render: (id) => {
-                            return <Link to={`/grade?classId=${id}&quarter=2`}><Button>2nd Quarter</Button></Link>;
-                        }
-                    },
-                    {
-                        title: '',
-                        dataIndex: 'id',
-                        key: '3rd-quarter',
-                        render: (id) => {
-                            return <Link to={`/grade?classId=${id}&quarter=3`}><Button>3rd Quarter</Button></Link>;
-                        }
-                    },
-                    {
-                        title: '',
-                        dataIndex: 'id',
-                        key: '4th-quarter',
-                        render: (id) => {
-                            return <Link to={`/grade?classId=${id}&quarter=4`}><Button>4th Quarter</Button></Link>;
-                        }
-                    },
-                    {
-                        title: '',
-                        dataIndex: 'id',
-                        key: 'finale-grades',
-                        render: (id) => {
-                            return <Link to={`/finalGrades?classId=${id}`}><Button>Final Grades</Button></Link>;
-                        }
-                    },
+                    }
                 ]}
             />
         </>

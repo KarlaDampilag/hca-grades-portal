@@ -300,7 +300,7 @@ const resolvers = {
     classesBySectionId: async (root, args, context) => {
       const callback = async () => {
         try {
-          const section = await Section.findOne({ id: args.sectionId });
+          const section = await Section.findById(args.sectionId);
           if (!section) {
             throw new Error('Section not found');
           }

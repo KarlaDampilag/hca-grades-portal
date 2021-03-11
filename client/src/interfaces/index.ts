@@ -9,7 +9,8 @@ export interface User {
 
 export interface Role {
     type: string,
-    lrn?: string
+    lrn?: string,
+    sectionId?: string
 }
 
 export interface Section {
