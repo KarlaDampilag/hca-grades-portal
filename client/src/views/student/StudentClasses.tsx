@@ -118,8 +118,8 @@ const StudentClasses = (props) => {
                         title: 'Grades',
                         dataIndex: 'id',
                         key: '1st-quarter',
-                        render: (id) => {
-                            return <Link to={`/studentGrade?classId=${id}`}><Button>View</Button></Link>;
+                        render: (id, record) => {
+                            return <Link to={`/studentGrade?classId=${id}&class=${record.name}`}><Button>View</Button></Link>;
                         }
                     }
                 ]}

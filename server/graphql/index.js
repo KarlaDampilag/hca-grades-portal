@@ -73,6 +73,7 @@ type Query {
   classesBySectionId(sectionId: String!): [Class]
   class(id: String!): Class
   gradesByClassId(classId: String!, quarter: Int): [Grade]
+  studentGradesByClassId(classId: String!): [Grade]
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -123,6 +124,14 @@ const getRequesterId = (context) => {
   if (cookies && cookies.token) {
     const decoded = validateToken(cookies.token);
     return decoded.data._id;
+  }
+};
+
+const getCurrentUser = (context) => {
+  const cookies = context.req.cookies;
+  if (cookies && cookies.token) {
+    const decoded = validateToken(cookies.token);
+    return decoded.data;
   }
 };
 
@@ -382,6 +391,33 @@ const resolvers = {
         }
       };
       return await protectEndpoint(context, ['admin', 'schoolAdmin', 'teacher'], callback);
+    },
+    studentGradesByClassId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const myClass = await Class.findOne({ id: args.classId });
+
+          if (!myClass) {
+            throw new Error('Class not found');
+          }
+
+          const user = getCurrentUser(context);
+          const grades = await Grade.find({ classId: myClass._id, studentId: user._id }).exec();
+
+          if (!_.isEmpty(grades)) {
+            for (const grade of grades) {
+              grade.studentId = user;
+              grade.classId = myClass;
+            }
+            return grades;
+          } else {
+            return [];
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'student'], callback);
     }
   },
   Mutation: {
