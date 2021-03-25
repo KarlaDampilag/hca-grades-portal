@@ -42,7 +42,7 @@ const getFinalGrades = (grades: Grade[]): FinalGrade[] => {
 }
 
 // TODO unconfirmed formula
-const getFinalGrade = (grade: FinalGrade): number =>  {
+const getFinalGrade = (grade: FinalGrade): number => {
     return (grade['1'] + grade['2'] + grade['3'] + grade['4']) / 4;
 }
 
@@ -76,7 +76,7 @@ const FinalGrades = (props) => {
         }
         `;
 
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const FinalGrades = (props) => {
             }
             `;
 
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ const GradeView = (props) => {
             }
             `;
 
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

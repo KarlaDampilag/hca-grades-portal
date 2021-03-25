@@ -68,7 +68,7 @@ const AddSection = () => {
             holder.push(user);
             setTeachers(holder);
         } else {
-            fetch('http://localhost:4000/graphql', {
+            fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const AddSection = () => {
                 }
                 `;
 
-            fetch('http://localhost:4000/graphql', {
+            fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -259,14 +259,14 @@ const AddSection = () => {
                     rules={[{ required: true, message: 'Please upload a section file!' }]}
                 >
                     <input
-                    type='file'
-                    id='sectionFileUpload'
-                    name='sectionFileUpload'
-                    accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    onChange={(e) => {
-                        setIsLoading(true);
-                        handleFileUploadChange(e);
-                    }} />
+                        type='file'
+                        id='sectionFileUpload'
+                        name='sectionFileUpload'
+                        accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        onChange={(e) => {
+                            setIsLoading(true);
+                            handleFileUploadChange(e);
+                        }} />
                 </Form.Item>
 
                 <h2>Students Preview:</h2>

@@ -50,13 +50,13 @@ const AddTeacher = () => {
         const nameArr: string[] = jsonObject.name.split(',');
         const lastName = nameArr[0];
         const nameArr2 = nameArr[1].trim().split(' ');
-        
+
         let firstName = '';
         for (let i = 0; i < nameArr2.length - 1; i++) {
             firstName = firstName.concat(` ${nameArr2[i]}`);
         }
 
-        const middleInitial = nameArr2[nameArr2.length-1];
+        const middleInitial = nameArr2[nameArr2.length - 1];
         const userName = generateUsername(jsonObject.index, firstName, lastName);
         const password = generatePassword();
 
@@ -118,7 +118,7 @@ const AddTeacher = () => {
         const normalizedTeachers: teacher[] = [];
         const teachersCopy = [...teachers];
         for (const teacher of teachersCopy) {
-            const teacherCopy = {...teacher};
+            const teacherCopy = { ...teacher };
             delete teacherCopy.role.indexInSheet;
             normalizedTeachers.push(teacherCopy);
         }
@@ -134,7 +134,7 @@ const AddTeacher = () => {
                 }
                 `;
 
-            fetch('http://localhost:4000/graphql', {
+            fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
