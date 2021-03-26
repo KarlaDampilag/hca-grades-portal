@@ -16,6 +16,7 @@ const dbURI = 'mongodb+srv://admin:Liop890890!@cluster0.adxil.mongodb.net/hope?r
 // const APP_SECRET = 'sdlfkj08234lksdf'; // move to env 
 
 // import authRoute from './routes/auth';
+// git subtree push --prefix server heroku master
 
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
