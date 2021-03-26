@@ -60,7 +60,7 @@ const Login = () => {
                     message.error(res.errors[0].message, 7);
                 }
                 if (res && res.data && res.data.login) {
-                    history.push('/');
+                    window.location.reload();
                 }
             })
     }
