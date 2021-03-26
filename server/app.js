@@ -31,7 +31,7 @@ app.use(
     cookieParser(),
     bodyParser.json(),
     cors({
-        origin: 'http://localhost:3000', // todo use env var
+        origin: ['http://localhost:3000', 'https://605db29e28d190f3b1b526d5--hca-grade-portal.netlify.app'],
         optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
         credentials: true
     })
