@@ -11,7 +11,7 @@ import bodyParser from 'body-parser';
 import schema from './graphql/index.js';
 
 const app = express();
-const PORT = 4000; // move to env
+const PORT = process.env.PORT || 4000; // move to env
 const dbURI = 'mongodb+srv://admin:Liop890890!@cluster0.adxil.mongodb.net/hope?retryWrites=true&w=majority'; // move to env
 // const APP_SECRET = 'sdlfkj08234lksdf'; // move to env 
 
