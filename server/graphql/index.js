@@ -546,7 +546,9 @@ const resolvers = {
         const token = generateToken(user);
         context.res.cookie('token', token, {
           httpOnly: true,
-          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie
+          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie,
+          sameSite: 'none',
+          secure: true
         });
 
         return user;
