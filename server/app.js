@@ -27,6 +27,8 @@ db.once('open', () => {
     console.log('DB started successfully');
 });
 
+app.set('trust proxy', 1);
+
 app.use(
     cookieParser(),
     bodyParser.json(),
