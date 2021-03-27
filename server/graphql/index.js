@@ -74,6 +74,7 @@ type Query {
   class(id: String!): Class
   gradesByClassId(classId: String!, quarter: Int): [Grade]
   studentGradesByClassId(classId: String!): [Grade]
+  gradesByStudentId: [Grade]
 }
 type Mutation {
   addUser(id: String!, firstName: String!, lastName: String!, middleInitial: String, email: String!, password: String!, role: Object!): User
@@ -407,6 +408,32 @@ const resolvers = {
           if (!_.isEmpty(grades)) {
             for (const grade of grades) {
               grade.studentId = user;
+              grade.classId = myClass;
+            }
+            return grades;
+          } else {
+            return [];
+          }
+        } catch (err) {
+          throw new Error(err);
+        }
+      };
+      return await protectEndpoint(context, ['admin', 'student'], callback);
+    },
+    gradesByStudentId: async (root, args, context) => {
+      const callback = async () => {
+        try {
+          const user = getCurrentUser(context);
+          const grades = await Grade.find({ studentId: user._id }).exec();
+
+          if (!_.isEmpty(grades)) {
+            for (const grade of grades) {
+              grade.studentId = user;
+
+              const myClass = await Class.findById(grade.classId);
+              if (!myClass) {
+                throw new Error('Class not found');
+              }
               grade.classId = myClass;
             }
             return grades;

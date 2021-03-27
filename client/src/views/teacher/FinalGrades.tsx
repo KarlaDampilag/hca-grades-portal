@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import { MyClass, Grade, User } from '../../interfaces';
+import { getFinalGrade } from '../../utils/utils';
 import DataTable from '../../components/DataTable';
 import NoViewPermission from '../../components/NoViewPermission';
 import { MyContext } from '../../App';
@@ -41,10 +42,7 @@ const getFinalGrades = (grades: Grade[]): FinalGrade[] => {
     return finalGrades;
 }
 
-// TODO unconfirmed formula
-const getFinalGrade = (grade: FinalGrade): number => {
-    return (grade['1'] + grade['2'] + grade['3'] + grade['4']) / 4;
-}
+
 
 const FinalGrades = (props) => {
     const context = React.useContext(MyContext);
