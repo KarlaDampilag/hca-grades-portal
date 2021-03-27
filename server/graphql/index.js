@@ -558,7 +558,12 @@ const resolvers = {
     },
     logout: async (root, args, context) => {
       try {
-        context.res.clearCookie('token');
+        context.res.clearCookie('token', {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year cookie,
+          sameSite: 'none',
+          secure: true
+        });
       } catch (err) {
         throw new Error(err);
       }
