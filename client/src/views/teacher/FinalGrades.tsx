@@ -53,11 +53,13 @@ const FinalGrades = (props) => {
 
     const [myClass, setMyClass] = React.useState<MyClass>();
     const [grades, setGrades] = React.useState<readonly FinalGrade[]>();
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     const urlQuery = new URLSearchParams(props.location.search);
     const id = urlQuery.get('classId');
 
     React.useEffect(() => {
+        setIsLoading(true);
         const classQuery = `
         query($id: String!) {
             class(id: $id) {
@@ -129,9 +131,12 @@ const FinalGrades = (props) => {
             .then(res => res.json())
             .then(res => {
                 setGrades(getFinalGrades(res.data.gradesByClassId));
-                // setGrades(res.data.gradesByClassId);
+                setIsLoading(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                setIsLoading(false);
+            });
 
     }, []);
 
@@ -144,6 +149,7 @@ const FinalGrades = (props) => {
             <Link to={`/classes?sectionId=${myClass?.sectionId?.id}`}><Button icon={<ArrowLeftOutlined />}>Return To Classes</Button></Link>
             <h1>{`Final grades - ${myClass?.name} - ${myClass?.sectionId?.name}`}</h1>
             <DataTable
+                loading={isLoading}
                 data={grades}
                 columns={[
                     {
