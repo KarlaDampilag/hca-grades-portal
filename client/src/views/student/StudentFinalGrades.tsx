@@ -70,6 +70,7 @@ const StudentFinalGrades = () => {
     }
 
     React.useEffect(() => {
+        setIsLoading(true);
         const query = `
             query {
                 gradesByStudentId {
