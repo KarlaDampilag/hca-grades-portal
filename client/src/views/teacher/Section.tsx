@@ -17,8 +17,10 @@ const SectionView = (props) => {
 
     const [section, setSection] = React.useState<Section>();
     const [students, setStudents] = React.useState<readonly User[]>();
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     React.useEffect(() => {
+        setIsLoading(true);
         const urlQuery = new URLSearchParams(props.location.search);
         const id = urlQuery.get('id')
 
@@ -48,8 +50,12 @@ const SectionView = (props) => {
             .then(res => res.json())
             .then(res => {
                 setSection(res.data.section);
+                setIsLoading(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                setIsLoading(false);
+            });
 
         const studentsQuery = `
         query($id: String!) {
@@ -93,6 +99,7 @@ const SectionView = (props) => {
             <Link to='/sections'><Button icon={<ArrowLeftOutlined />}>Return To Sections</Button></Link>
             <h1>{section?.name}</h1>
             <DataTable
+                loading={isLoading}
                 data={students}
                 columns={[
                     {
