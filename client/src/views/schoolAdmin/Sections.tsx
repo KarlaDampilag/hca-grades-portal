@@ -21,8 +21,10 @@ const Sections = (props: Properties) => {
 
     const [sections, setSections] = React.useState<readonly Section[]>([]);
     const [sectionFilter, setSectionFilter] = React.useState<'mine' | 'all'>('all');
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     React.useEffect(() => {
+        setIsLoading(true);
         if (user) {
             const query = `
                 query {
@@ -52,8 +54,12 @@ const Sections = (props: Properties) => {
                 .then(res => res.json())
                 .then(res => {
                     setSections(res.data.sections);
+                    setIsLoading(false);
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    console.log(err);
+                    setIsLoading(false);
+                });
         }
     }, []);
 
@@ -79,6 +85,7 @@ const Sections = (props: Properties) => {
             </Radio.Group> */}
             <h1>Sections</h1>
             <DataTable
+                loading={isLoading}
                 data={finalSections}
                 columns={[
                     {
