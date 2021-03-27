@@ -21,7 +21,7 @@ const LogoutButton = () => {
                 query
             })
         })
-            .then(res => console.log(res))
+            .then(() => window.location.reload())
             .catch(err => console.log(err));
     }
 
@@ -29,7 +29,6 @@ const LogoutButton = () => {
         <Button
             onClick={async () => {
                 await logout();
-                window.location.reload();
             }}
         >
             Logout
