@@ -5,7 +5,7 @@ import { Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import { MyClass, Grade, User } from '../../interfaces';
-import { getFinalGrade } from '../../utils/utils';
+import { getFinalGradeView } from '../../utils/utils';
 import DataTable from '../../components/DataTable';
 import NoViewPermission from '../../components/NoViewPermission';
 import { MyContext } from '../../App';
@@ -193,7 +193,7 @@ const FinalGrades = (props) => {
                         dataIndex: 'student',
                         key: 'final-grade',
                         render: (value, record) => {
-                            return getFinalGrade(record);
+                            return getFinalGradeView(record);
                         }
                     },
                 ]}
