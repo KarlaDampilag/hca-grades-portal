@@ -25,6 +25,12 @@ const Documentation = () => {
                 <li><Link to='/docs/schoolAdmin/teachers'>View and add Teachers</Link></li>
                 <li><Link to='/docs/schoolAdmin/sections'>View and add Sections</Link></li>
             </ul>
+
+            <h2>Teacher</h2>
+            <ul>
+                <li><Link to='/docs/teacher/classes'>View and add Classes</Link></li>
+                <li><Link to='/docs/teacher/grades'>View and add Grades</Link></li>
+            </ul>
         </>
     );
 }

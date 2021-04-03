@@ -28,6 +28,8 @@ import StudentFinalGrades from './views/student/StudentFinalGrades';
 import Documentation from './views/universal/documentation';
 import SectionsDocs from './views/universal/documentation/schoolAdmin/Sections';
 import TeachersDocs from './views/universal/documentation/schoolAdmin/Teachers';
+import ClassesDocs from './views/universal/documentation/teacher/Classes';
+import GradesDocs from './views/universal/documentation/teacher/Grades';
 
 import { User } from './interfaces';
 
@@ -111,6 +113,8 @@ function App() {
               <Route path='/studentFinalGrades' component={StudentFinalGrades} />
               <Route path='/docs/schoolAdmin/sections' component={SectionsDocs} />
               <Route path='/docs/schoolAdmin/teachers' component={TeachersDocs} />
+              <Route path='/docs/teacher/classes' component={ClassesDocs} />
+              <Route path='/docs/teacher/grades' component={GradesDocs} />
               <Route path='/docs' component={Documentation} />
               {user && user.role.type == 'student' ? <Route exact path='/' component={StudentClasses} /> : <Route exact path='/' component={Classes} />}
             </Switch>
