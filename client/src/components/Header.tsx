@@ -52,6 +52,10 @@ const Header = () => {
                                     <Menu.Item key='grade'><Link to='/studentFinalGrades'>Final Grades</Link></Menu.Item>
                                 </>
                             }
+                            {
+                                (user.role.type == 'admin' || user.role.type == 'schoolAdmin' || user.role.type == 'teacher') &&
+                                <Menu.Item key='docs'><Link to='/docs'>Documentation</Link></Menu.Item>
+                            }
                             <LogoutButton />
                             <span id='welcome'>{`Welcome, ${user.firstName} ${user.lastName}!`}</span>
                         </> :

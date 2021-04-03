@@ -25,6 +25,9 @@ import Header from './components/Header';
 import StudentClasses from './views/student/StudentClasses';
 import StudentGrade from './views/student/StudentGrade';
 import StudentFinalGrades from './views/student/StudentFinalGrades';
+import Documentation from './views/universal/documentation';
+import SectionsDocs from './views/universal/documentation/schoolAdmin/Sections';
+import TeachersDocs from './views/universal/documentation/schoolAdmin/Teachers';
 
 import { User } from './interfaces';
 
@@ -106,6 +109,9 @@ function App() {
               <Route path='/studentClasses' component={StudentClasses} />
               <Route path='/studentGrade' component={StudentGrade} />
               <Route path='/studentFinalGrades' component={StudentFinalGrades} />
+              <Route path='/docs/schoolAdmin/sections' component={SectionsDocs} />
+              <Route path='/docs/schoolAdmin/teachers' component={TeachersDocs} />
+              <Route path='/docs' component={Documentation} />
               {user && user.role.type == 'student' ? <Route exact path='/' component={StudentClasses} /> : <Route exact path='/' component={Classes} />}
             </Switch>
           </Card>
